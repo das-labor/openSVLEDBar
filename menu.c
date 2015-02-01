@@ -3,28 +3,29 @@
 (2x8 Display)
 
 - Mode
-  - Fixed
-  	- Color 1 / all
-      - Red-Blue 0-255
-  	- Color 2
-      - Red-Blue 0-255
-  	- Color 3
-      - Red-Blue 0-255
-  - DMX
-  - Auto
+  - DMX 3 Channel
+    - Address 0-255
+  - DMX 9 Channel
+    - Address 0-255
+  - Fixed Color Mode
+  	- Color Segment 1 Red 0-255
+	- Color Segment 1 Green 0-255
+	- Color Segment 1 Blue 0-255
+    - Color Segment 2 Red 0-255
+    - Color Segment 2 Green 0-255
+    - Color Segment 2 Blue 0-255
+   	- Color Segment 3 Red 0-255
+   	- Color Segment 3 Green 0-255
+   	- Color Segment 3 Blue 0-255
+  - Auto Mode
 	- Program 1-5
+	- Speed
+	- Fade Time
   - Slave Mode
-- Division
-  - 3 parts
-  - 1 part
-- Channel (only Mode=DMX)
-  - DMX 1-512
-- Fade
-  - Off-0.1-25.5 sec
-- Toggle
-  - BPM
-  	- 1-256
-  - Sound
+  - Sound to Light
+    - Program 1-5
+	- Speed
+	- Fade Time
 */
 
 #include <avr/pgmspace.h>
@@ -32,7 +33,7 @@
 #include "settings.h"
 
 const char* const menuStrings[] PROGMEM = {
-	"OpenSWLB",
+	"OpenSVLB",
 	"by e7p",
 	"Division",
 	"1 part",
