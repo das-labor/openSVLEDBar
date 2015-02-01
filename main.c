@@ -26,13 +26,13 @@ int main() {
 			//enter menu
 			menuDraw();
 		}
-		if(PIND & (1<<PD4))
+		if(PIND & (1<<PD5))
 		{
 			if(menuMode<=6){menuMode++;} //go to next menu item
 				else{menuMode=0;}
 			menuDraw();
 		}
-		if(PIND & (1<<PD4))
+		if(PIND & (1<<PD6))
 		{
 			if(menuMode>0){menuMode--;}	//go to previous menu item
 			else{menuMode=6;}
