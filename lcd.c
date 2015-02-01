@@ -1,5 +1,6 @@
 #include <util/delay.h>
-
+#include <avr/io.h>
+#include <stdio.h>
 #include "lcd.h"
 
 #define LCD_RW (1 << PB0)

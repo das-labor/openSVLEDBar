@@ -1,5 +1,6 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
+enum MODE menuMode;
 
 enum MODE {
 	MODE_AUTO,

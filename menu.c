@@ -32,9 +32,11 @@
 #include "lcd.h"
 #include "settings.h"
 
+
+
 const char* const menuStrings[] PROGMEM = {
 	"OpenSVLB",
-	"by e7p",
+	"das-labor.org",
 	"Division",
 	"1 part",
 	"3 parts",
@@ -59,9 +61,32 @@ const char* const menuStrings[] PROGMEM = {
 void menuSleep() {
 	lcdClear();
 	lcdPuts_p(0, 0, menuStrings[0]);
-	lcdPuts_p(1, 1, menuStrings[0]);
+	lcdPuts_p(1, 1, menuStrings[1]);
 }
 
 void menuDraw() {
-	//if(settingMode);
+	if (menuMode==MODE_AUTO)
+	{
+		//Automodus
+	}
+	else if(menuMode==MODE_FIXED)
+	{
+		lcdPuts_p(0, 0, "fixed color");
+	}
+	else if(menuMode==MODE_DMX_3)
+	{
+		lcdPuts_p(0, 0, "DMX 3ch");
+	}
+	else if(menuMode==MODE_DMX_9)
+	{
+		lcdPuts_p(0, 0, "DMX 9ch");
+	}
+	else if(menuMode==MODE_SLAVE)
+	{
+		//same as DMX Mode but listening at addr. 54
+	}
+	else if(menuMode==MODE_SOUND)
+	{
+		
+	}
 }
