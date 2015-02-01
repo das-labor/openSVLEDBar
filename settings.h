@@ -4,14 +4,13 @@
 enum MODE {
 	MODE_AUTO,
 	MODE_FIXED,
-	MODE_DMX,
-	MODE_SLAVE
+	MODE_DMX_3,
+	MODE_DMX_9,
+	MODE_SLAVE,
+	MODE_SOUND
 };
 
-enum DIVISION {
-	DIV_THREE,
-	DIV_ONE
-};
+
 
 typedef union {
 	struct {
@@ -24,7 +23,6 @@ typedef union {
 
 typedef struct {
 	enum MODE mode;
-	enum DIVISION division;
 	uint8_t fade; /* 0 = Off, 1-255 = 0.1-25.5 seconds */
 	uint8_t toggleBPM; /* 0 = Off, 1-254 = BPM, 255 = SoundToLight */
 	tColor color[3];
