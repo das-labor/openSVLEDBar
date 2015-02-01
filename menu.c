@@ -8,15 +8,15 @@
   - DMX 9 Channel
     - Address 0-255
   - Fixed Color Mode
-  	- Color Segment 1 Red 0-255
-	- Color Segment 1 Green 0-255
-	- Color Segment 1 Blue 0-255
-    - Color Segment 2 Red 0-255
-    - Color Segment 2 Green 0-255
-    - Color Segment 2 Blue 0-255
-   	- Color Segment 3 Red 0-255
-   	- Color Segment 3 Green 0-255
-   	- Color Segment 3 Blue 0-255
+  	- Segment 1 Red 0-255
+	- Segment 1 Green 0-255
+	- Segment 1 Blue 0-255
+    - Segment 2 Red 0-255
+    - Segment 2 Green 0-255
+    - Segment 2 Blue 0-255
+   	- Segment 3 Red 0-255
+   	- Segment 3 Green 0-255
+   	- Segment 3 Blue 0-255
   - Auto Mode
 	- Program 1-5
 	- Speed
