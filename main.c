@@ -38,9 +38,10 @@ int main() {
 	menuSleep();
 
 	// Initialize Timers
-	TCCR0 |= (1 << CS01); // Prescaler 8
+	TCCR0 = (1 << CS01); // Prescaler 8
 	TCNT0 = 0xE8;
-	TCCR1B |= (1 << CS11); // Prescaler 8
+	TCCR1A = 0;
+	TCCR1B = (1 << CS11); // Prescaler 8
 	TCNT1H = 0x8A;
 	TCNT1L = 0xD0;
 	TIMSK1 |= (1 << TOIE1) | (1 << TOIE0);
