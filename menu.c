@@ -34,9 +34,9 @@
 
 
 
-const char* const menuStrings[] PROGMEM = {
+const char menuStrings[][9] PROGMEM = {
 	"OpenSVLB",
-	"das-labor.org",
+	"by labor",
 	"Division",
 	"1 part",
 	"3 parts",
@@ -60,8 +60,8 @@ const char* const menuStrings[] PROGMEM = {
 
 void menuSleep() {
 	lcdClear();
-	lcdPuts_p(0, 0, menuStrings[0]);
-	lcdPuts_p(1, 1, menuStrings[1]);
+	lcdPuts_p(0, 0, &menuStrings[0]);
+	lcdPuts_p(0, 1, &menuStrings[1]);
 }
 
 void menuDraw() {
@@ -71,15 +71,15 @@ void menuDraw() {
 	}
 	else if(menuMode==MODE_FIXED)
 	{
-		lcdPuts_p(0, 0, "fixed color");
+		lcdPuts(0, 0, "fixed co");
 	}
 	else if(menuMode==MODE_DMX_3)
 	{
-		lcdPuts_p(0, 0, "DMX 3ch");
+		lcdPuts(0, 0, "DMX 3ch");
 	}
 	else if(menuMode==MODE_DMX_9)
 	{
-		lcdPuts_p(0, 0, "DMX 9ch");
+		lcdPuts(0, 0, "DMX 9ch");
 	}
 	else if(menuMode==MODE_SLAVE)
 	{

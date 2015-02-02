@@ -40,9 +40,9 @@ void initLCD() {
 }
 
 void lcdWaitBusyFlag() {
-	//uint8_t i = 0;
+	uint8_t i = 0;
 	/* Wait for busy flag */
-	while(1) { // TODO FIXME IF DON'T WORK (i++ < 255)
+	while(i++ < 255) {
 		PORTA = 0xFF;
 		PORTB &= ~LCD_RS;
 		PORTB |= LCD_RW;
