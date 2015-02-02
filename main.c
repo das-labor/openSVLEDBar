@@ -52,22 +52,23 @@ int main() {
 	
 	while(1) {
 		if(buttonValue & KEY_MENU) {
-			// Enter menu
-			menuDraw();
-		}
-		if(buttonValue & KEY_UP) {
-			if(menuMode <= 6) {
-				menuMode++; // go to next menu item
-			} else {
-				menuMode = 0;
+			if(mode<=1){
+				mode++;
+			}
+			else{
+				mode--
 			}
 			menuDraw();
 		}
-		if(buttonValue & KEY_DOWN) {
-			if(menuMode > 0) {
-				menuMode--; // go to previous menu item
-			} else {
-				menuMode = 6;
+		if(buttonValue & KEY_UP) {
+			if(mode==0){
+				nextMode()
+				menuDraw();
+			}
+		}
+		if(buttonValue & KEY_DOWN&&mode==0) {
+			if(mode==0){
+				prevMode()
 			}
 			menuDraw();
 		}

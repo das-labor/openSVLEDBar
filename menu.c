@@ -13,6 +13,7 @@
   - Program 1-5
   - Speed
   - Fade Time
+  - back
 - Fixed Color Mode
   - Segment 1 Red 0-255
   - Segment 1 Green 0-255
@@ -23,14 +24,19 @@
   - Segment 3 Red 0-255
   - Segment 3 Green 0-255
   - Segment 3 Blue 0-255
+  - back
 - DMX 3 Channel
   - Address 0-512 (?)
+  - back
 - DMX 9 Channel
   - Address 0-512 (?)
+  - back
 - Slave Mode
+	- back
 - Sound to Light
   - Program 1-5
   - Fade Time
+  - back
 */
 
 #include <avr/pgmspace.h>
@@ -71,6 +77,49 @@ void menuSleep() {
 	lcdPuts_p(0, 1, &menuStrings[1]);
 }
 
+void nextMode(){
+	if(menuMode <= 6) {
+		menuMode++; // go to next Mode
+		} else {
+		menuMode = 0;
+	}
+}
+
+void prevMode(){
+	if(menuMode > 0) {
+		menuMode--; // go to previous Mode
+		} else {
+		menuMode = 6;
+	}
+}
+
+void nextSetting(){
+	if (menuMode==MODE_SLAVE)
+	{
+		mode=0;//im slave mode sind keine weiteren einstellungen möglich
+	}
+	else if((menuMode==MODE_DMX_3 |= menuMode==MODE_DMX_9) && mode<1)
+	{
+		mode++;
+	}
+	else if(menuMode==MODE_SOUND && mode<3)
+	{
+		mode++;
+	}
+	else if(menuMode==MODE_AUTO && mode<4){
+		mode++;
+	}
+	else{
+		mode--;
+	}
+}
+
+void prevSetting(){
+	
+}
+
+
+
 void menuDraw() {
 	sleepMode = 0;
 	lcdClear();
@@ -98,10 +147,11 @@ void menuDraw() {
 	}
 	else if(menuMode==MODE_SLAVE)
 	{
+		lcdPuts(0, 0, "slave");
 		//same as DMX Mode but listening at addr. 54
 	}
 	else if(menuMode==MODE_SOUND)
 	{
-		
+		lcdPuts(0, 0, "sound");
 	}
 }
