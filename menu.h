@@ -4,4 +4,6 @@
 void menuSleep();
 void menuDraw();
 
+extern uint8_t menuMode;
+
 #endif
