@@ -9,7 +9,8 @@
 
 #define LCD_ENABLE_US 20
 
-void initLCD() {
+void initLCD(void)
+{
 	/* initialize Ports */
 	PORTA = 0x00;
 	DDRA = 0xFF;
@@ -39,7 +40,8 @@ void initLCD() {
 	lcdWriteCommand(0x0C); /* Display on */
 }
 
-void lcdWaitBusyFlag() {
+void lcdWaitBusyFlag(void)
+{
 	uint8_t i = 0;
 	/* Wait for busy flag */
 	while(i++ < 255) {
@@ -57,7 +59,8 @@ void lcdWaitBusyFlag() {
 	DDRA = 0xFF;
 }
 
-void lcdWriteCommand(uint8_t command) {
+void lcdWriteCommand(uint8_t command)
+{
 	lcdWaitBusyFlag();
 
 	PORTB &= ~LCD_RS;
@@ -67,7 +70,8 @@ void lcdWriteCommand(uint8_t command) {
 	PORTB &= ~LCD_EN;
 }
 
-void lcdWriteData(uint8_t data) {
+void lcdWriteData(uint8_t data)
+{
 	lcdWaitBusyFlag();
 
 	PORTB |= LCD_RS;
@@ -77,11 +81,22 @@ void lcdWriteData(uint8_t data) {
 	PORTB &= ~LCD_EN;
 }
 
-void lcdClear() {
+void lcdClear(void)
+{
 	lcdWriteCommand(0x01);
 }
 
-void lcdPuts(uint8_t x, uint8_t y, const char* string) {
+void lcdPutc(uint8_t x, uint8_t y, char c)
+{
+	/* Simplified set address */
+	if(y) y = 0x40;
+	lcdWriteCommand(0x80 | y | x);
+
+	lcdWriteData(c);
+}
+
+void lcdPuts(uint8_t x, uint8_t y, const char* string)
+{
 	/* Simplified set address */
 	if(y) y = 0x40;
 	lcdWriteCommand(0x80 | y | x);
@@ -91,7 +106,8 @@ void lcdPuts(uint8_t x, uint8_t y, const char* string) {
 	}
 }
 
-void lcdPuts_p(uint8_t x, uint8_t y, const char* string PROGMEM) {
+void lcdPuts_p(uint8_t x, uint8_t y, const char* string PROGMEM)
+{
 	/* Simplified set address */
 	if(y) y = 0x40;
 	lcdWriteCommand(0x80 | y | x);

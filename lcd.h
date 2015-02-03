@@ -3,14 +3,15 @@
 
 #include <avr/pgmspace.h>
 
-void initLCD();
+void initLCD(void);
 
-void lcdWaitBusyFlag();
-void lcdWriteCommand(uint8_t);
-void lcdWriteData(uint8_t);
+void lcdWaitBusyFlag(void);
+void lcdWriteCommand(uint8_t command);
+void lcdWriteData(uint8_t data);
 
-void lcdClear();
-void lcdPuts(uint8_t, uint8_t, const char*);
-void lcdPuts_p(uint8_t, uint8_t, const char* PROGMEM);
+void lcdClear(void);
+void lcdPutc(uint8_t x, uint8_t y, char c);
+void lcdPuts(uint8_t x, uint8_t y, const char* string);
+void lcdPuts_p(uint8_t x, uint8_t y, const char* string PROGMEM);
 
 #endif

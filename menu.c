@@ -1,157 +1,152 @@
-/* Menu 
-
-(2x8 Display)
-
+/* Menu:
 - Mode
   - Auto
+    - Program 1-5
+    - Fade Time
+    - Speed
+    - back
   - Fixed
+    - Segment 1 Red 0-255
+    - Segment 1 Green 0-255
+    - Segment 1 Blue 0-255
+    - Segment 2 Red 0-255
+    - Segment 2 Green 0-255
+    - Segment 2 Blue 0-255
+    - Segment 3 Red 0-255
+    - Segment 3 Green 0-255
+    - Segment 3 Blue 0-255
+    - back
   - DMX 3ch
+    - Address 1-510
+    - back
   - DMX 9ch
+    - Address 1-504
+    - back
   - Slave
+    - back
   - Sound
-- Auto Mode
-  - Program 1-5
-  - Speed
-  - Fade Time
-  - back
-- Fixed Color Mode
-  - Segment 1 Red 0-255
-  - Segment 1 Green 0-255
-  - Segment 1 Blue 0-255
-  - Segment 2 Red 0-255
-  - Segment 2 Green 0-255
-  - Segment 2 Blue 0-255
-  - Segment 3 Red 0-255
-  - Segment 3 Green 0-255
-  - Segment 3 Blue 0-255
-  - back
-- DMX 3 Channel
-  - Address 0-512 (?)
-  - back
-- DMX 9 Channel
-  - Address 0-512 (?)
-  - back
-- Slave Mode
-	- back
-- Sound to Light
-  - Program 1-5
-  - Fade Time
-  - back
+    - Program 1-5
+    - Fade Time
+    - back
 */
 
 #include <avr/pgmspace.h>
 #include "lcd.h"
 #include "settings.h"
 
-const char menuStrings[][9] PROGMEM = {
+const char sleepStrings[][9] PROGMEM = {
 	"OpenSVLB",
 	"by labor",
-	"Mode",
+};
+
+const char modeString[] PROGMEM = "Mode";
+
+const char menuModeStrings[][9] PROGMEM = {
 	"Auto",
 	"Fixed",
 	"DMX 3ch",
 	"DMX 9ch",
 	"Slave",
 	"Sound",
-	"Color",
-	"Red",
-	"Green",
-	"Blue",
-	"Channel",
-	"Program",
-	"Fade",
-	"Off",
-	"sec",
-	"Toggle",
-	"BPM",
-	"Sound"
 };
 
-uint8_t sleepMode = 0;
+const char autoModeStrings[][9] PROGMEM = {
+	"Program",
+	"Speed",
+	"Fade"
+};
 
-void menuSleep() {
-	if(sleepMode) return;
-	sleepMode = 1;
+const char BPMString[] PROGMEM = "BPM";
+
+const char fadeStrings[][9] PROGMEM = {
+	"Off",
+	"sec"
+};
+
+const char colorStrings[][9] PROGMEM = {
+	"Red",
+	"Green",
+	"Blue"
+};
+
+const char addressString[] PROGMEM = "Address";
+
+const char backString[] PROGMEM = "\x1e back";
+
+#define MENU_STRING_FIRST_MODE	3
+#define MENU_STRING_BACK		9
+#define MENU_STRING_FIRST_AUTO	10
+
+enum MODE menuMode;
+uint8_t menuSetting;
+uint8_t menuStatus;
+/*
+ * status = 0: Sleep
+ * status = 1: Select Mode e.g. DMX 9ch
+ * status = 2: Select Setting e.g. Fade time, DMX address
+ * status = 3: Set value
+ */
+
+void menuSleep(void)
+{
+	menuStatus = 0;
+	menuDraw();
+}
+
+void menuEnter(void)
+{
+	if(menuStatus == 0) {
+		menuStatus = 1;
+	} else if(menuStatus == 1) {
+		menuSetting = 1; // Skip back
+		menuStatus = 2;
+	}
+	menuDraw();
+}
+
+void menuNext(void)
+{
+
+}
+
+void menuPrev(void)
+{
+
+}
+
+void menuDraw(void)
+{
 	lcdClear();
-	lcdPuts_p(0, 0, &menuStrings[0]);
-	lcdPuts_p(0, 1, &menuStrings[1]);
-}
+	switch(menuStatus) {
+		case 0: // Draw Sleep
+		lcdPuts_p(0, 0, &sleepStrings[0]);
+		lcdPuts_p(0, 1, &sleepStrings[1]);
+		break;
 
-void nextMode(){
-	if(menuMode <= 6) {
-		menuMode++; // go to next Mode
+		case 1: // Draw Mode
+		lcdPuts_p(2, 0, &modeString);
+		lcdPuts_p(0, 1, &menuModeStrings[menuMode]);
+		break;
+
+		case 2: // Draw Setting
+		lcdPuts_p(0, 1, &menuModeStrings[menuMode]);
+		if(menuSetting == 0) {
+			// Back setting
+			lcdPuts_p(1, 1, &backString);
 		} else {
-		menuMode = 0;
-	}
-}
+			// Other settings
+			if(menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
+				lcdPuts_p(0, 1, &autoModeStrings[menuSetting - 1]);
+			} else if(menuMode == MODE_FIXED) {
+				lcdPuts_p(0, 1, &colorStrings[(menuSetting - 1) % 3]);
+				lcdPutc(7, 1, '1' + (menuSetting - 1) / 3);
+			} else if(menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+				lcdPuts_p(0, 1, &addressString);
+			}
+		}
+		break;
 
-void prevMode(){
-	if(menuMode > 0) {
-		menuMode--; // go to previous Mode
-		} else {
-		menuMode = 6;
-	}
-}
-
-void nextSetting(){
-	if (menuMode==MODE_SLAVE)
-	{
-		mode=0;//im slave mode sind keine weiteren einstellungen möglich
-	}
-	else if((menuMode==MODE_DMX_3 |= menuMode==MODE_DMX_9) && mode<1)
-	{
-		mode++;
-	}
-	else if(menuMode==MODE_SOUND && mode<3)
-	{
-		mode++;
-	}
-	else if(menuMode==MODE_AUTO && mode<4){
-		mode++;
-	}
-	else{
-		mode--;
-	}
-}
-
-void prevSetting(){
-	
-}
-
-
-
-void menuDraw() {
-	sleepMode = 0;
-	lcdClear();
-	/* TODO: Implement other approach: mode = 0: Mode. mode = 1: Program. mode = 2: ...
-	 *		 In this case, the menu structure line 1: title, line 2: value can be achieved.
-	 *		 When in menu, first blinks title line, then press on mode lets the second line blink
-	 *		 and up down changes the current blinking line.
-	 *		 Otherwise I have simply NO idea how to get this better working on 2x8 Characters!!!
-	 *		 (Please think about it, sorry if I disturbed your work.)
-	 */
-	if (menuMode == 0) {
-		//Automodus
-	}
-	else if(menuMode==MODE_FIXED)
-	{
-		lcdPuts(0, 0, "fixed co");
-	}
-	else if(menuMode==MODE_DMX_3)
-	{
-		lcdPuts(0, 0, "DMX 3ch");
-	}
-	else if(menuMode==MODE_DMX_9)
-	{
-		lcdPuts(0, 0, "DMX 9ch");
-	}
-	else if(menuMode==MODE_SLAVE)
-	{
-		lcdPuts(0, 0, "slave");
-		//same as DMX Mode but listening at addr. 54
-	}
-	else if(menuMode==MODE_SOUND)
-	{
-		lcdPuts(0, 0, "sound");
+		case 3: // Draw Value
+		// TODO
 	}
 }

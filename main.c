@@ -8,17 +8,19 @@
 #define KEY_DOWN	(1 << PD6)
 
 /* Timer 0: 125kHz Software PWM */
-ISR(TIMER0_OVF_vect) {
+ISR(TIMER0_OVF_vect)
+{
 	TCNT0 = 0xE8;
 
 	/* TODO: Implement Software PWM for 9 Channels */
 }
 
 uint8_t buttonValue, buttonStatus;
-uint16_t timerCount = 0;
+uint16_t sleepTimer = 0;
 
 /* Timer 1: 10ms */
-ISR(TIMER1_OVF_vect) {
+ISR(TIMER1_OVF_vect)
+{
 	TCNT1H = 0x8A;
 	TCNT1L = 0xD0;
 
@@ -26,14 +28,16 @@ ISR(TIMER1_OVF_vect) {
 	buttonValue |= ~(PIND | buttonStatus);
 	buttonStatus = ~PIND | (buttonStatus & buttonValue);
 
-	timerCount++;
-	if(timerCount >= 1000) { // 10 seconds
-		menuSleep();
-		timerCount = 0;
+	if(sleepTimer > 0) {
+		sleepTimer--;
+		if(sleepTimer == 0) {
+			menuSleep();
+		}
 	}
 }
 
-int main() {
+int main(void)
+{
 	initLCD();
 	menuSleep();
 
@@ -51,26 +55,17 @@ int main() {
 	PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
 	
 	while(1) {
-		if(buttonValue & KEY_MENU) {
-			if(mode<=1){
-				mode++;
+		if(buttonValue & (KEY_MENU | KEY_UP | KEY_DOWN)) {
+			sleepTimer = 1000; // Set timer to 10 seconds
+			if(buttonValue & KEY_MENU) {
+				menuEnter();
 			}
-			else{
-				mode--
+			if(buttonValue & KEY_UP) {
+				menuNext();
 			}
-			menuDraw();
-		}
-		if(buttonValue & KEY_UP) {
-			if(mode==0){
-				nextMode()
-				menuDraw();
+			if(buttonValue & KEY_DOWN) {
+				menuPrev();
 			}
-		}
-		if(buttonValue & KEY_DOWN&&mode==0) {
-			if(mode==0){
-				prevMode()
-			}
-			menuDraw();
 		}
 	}
 	
