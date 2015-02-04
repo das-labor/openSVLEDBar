@@ -34,7 +34,7 @@ ISR(TIMER1_OVF_vect)
 	if(buttonValue & KEY_MENU) {
 		if(longEnter < 50) {
 			longEnter++;
-		} else {
+		} else if(longEnter != 0xFF) {
 			menuLongEnter();
 			longEnter = 0xFF;
 		}
