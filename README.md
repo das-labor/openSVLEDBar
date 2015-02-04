@@ -13,6 +13,7 @@ For now, only one LED Bar is supported:
 * 1.1 metres wide
 * Three segments of equal width
 * Available for ~80 Euros
+
 Each of its three individually controllable segments contain 84 LEDs (28 of red, green and blue LEDs) ordered up diagonally on the bar.
 This gives a fairly good color result.
 
