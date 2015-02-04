@@ -96,11 +96,33 @@ void menuSleep(void)
 
 void menuEnter(void)
 {
-	if(menuStatus == 0) {
+	switch(menuStatus) {
+		case 0:
 		menuStatus = 1;
-	} else if(menuStatus == 1) {
-		menuSetting = 1; // Skip back
+		break;
+
+		case 1:
+		if(menuMode == MODE_SLAVE) {
+			menuSetting = SETTING_BACK; // Slave mode only has back
+		} else {
+			menuSetting = 1; // Skip back
+		}
 		menuStatus = 2;
+		break;
+
+		case 2:
+		// Anything else to do?
+		if(menuSetting == SETTING_BACK) {
+			menuStatus = 1;
+		} else {
+			menuStatus = 3;
+		}
+		break;
+
+		case 3:
+		// Anything else to do?
+		menuStatus = 2;
+		break;
 	}
 	menuDraw();
 }
