@@ -18,7 +18,7 @@ ISR(TIMER0_OVF_vect)
 	/* TODO: Implement Software PWM for 9 Channels */
 }
 
-uint8_t buttonValue, buttonStatus;
+uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
 uint16_t sleepTimer = 0;
 
 /* Timer 1: 10ms */
@@ -30,6 +30,37 @@ ISR(TIMER1_OVF_vect)
 	// Simple key debouncing
 	buttonValue |= ~(PIND | buttonStatus);
 	buttonStatus = ~PIND | (buttonStatus & buttonValue);
+
+	if(buttonValue & KEY_MENU) {
+		if(longEnter < 50) {
+			longEnter++;
+		} else {
+			menuLongEnter();
+			longEnter = 0xFF;
+		}
+	} else {
+		longEnter = 0;
+	}
+
+	if(buttonValue & KEY_UP) {
+		if(longPrev < 50) {
+			longPrev++;
+		} else {
+			menuRepeatedlyPrev();
+		}
+	} else {
+		longPrev = 0;
+	}
+
+	if(buttonValue & KEY_DOWN) {
+		if(longNext < 50) {
+			longNext++;
+		} else {
+			menuRepeatedlyNext();
+		}
+	} else {
+		longNext = 0;
+	}
 
 	if(sleepTimer > 0) {
 		sleepTimer--;

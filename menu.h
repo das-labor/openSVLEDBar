@@ -21,12 +21,22 @@ enum MENU_SETTING {
 	SETTING_ADDRESS = 1
 };
 
+enum MENU_STATUS {
+	STATUS_SLEEP,
+	STATUS_MODE,
+	STATUS_SETTING,
+	STATUS_VALUE
+};
+
 void menuDraw(void);
 
 void menuSleep(void);
 
 void menuEnter(void);
+void menuLongEnter(void);
 void menuNext(void);
+void menuRepeatedlyNext(void);
 void menuPrev(void);
+void menuRepeatedlyPrev(void);
 
 #endif

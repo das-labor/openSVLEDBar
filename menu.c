@@ -80,7 +80,7 @@ const char backString[] PROGMEM = "\x1e back";
 
 enum MODE menuMode;
 enum MENU_SETTING menuSetting;
-uint8_t menuStatus;
+enum MENU_STATUS menuStatus;
 /*
  * status = 0: Sleep
  * status = 1: Select Mode e.g. DMX 9ch
@@ -90,39 +90,48 @@ uint8_t menuStatus;
 
 void menuSleep(void)
 {
-	menuStatus = 0;
+	menuStatus = STATUS_SLEEP;
 	menuDraw();
 }
 
 void menuEnter(void)
 {
 	switch(menuStatus) {
-		case 0:
-		menuStatus = 1;
+		case STATUS_SLEEP:
+		menuStatus = STATUS_MODE;
 		break;
 
-		case 1:
+		case STATUS_MODE:
 		if(menuMode == MODE_SLAVE) {
 			menuSetting = SETTING_BACK; // Slave mode only has back
 		} else {
 			menuSetting = 1; // Skip back
 		}
-		menuStatus = 2;
+		menuStatus = STATUS_SETTING;
 		break;
 
-		case 2:
-		// Anything else to do?
+		case STATUS_SETTING:
 		if(menuSetting == SETTING_BACK) {
-			menuStatus = 1;
+			menuStatus = STATUS_MODE;
 		} else {
-			menuStatus = 3;
+			menuStatus = STATUS_VALUE;
 		}
 		break;
 
-		case 3:
-		// Anything else to do?
-		menuStatus = 2;
+		case STATUS_VALUE:
+		menuStatus = STATUS_SETTING;
 		break;
+	}
+	menuDraw();
+}
+
+void menuLongEnter(void)
+{
+	// Long Enter goes back to the main Menu or to Sleep mode when there
+	if(menuStatus > STATUS_MODE) {
+		menuStatus = STATUS_MODE;
+	} else {
+		menuStatus = STATUS_SLEEP;
 	}
 	menuDraw();
 }
@@ -132,7 +141,17 @@ void menuNext(void)
 
 }
 
+void menuRepeatedlyNext(void)
+{
+
+}
+
 void menuPrev(void)
+{
+
+}
+
+void menuRepeatedlyPrev(void)
 {
 
 }
@@ -140,22 +159,22 @@ void menuPrev(void)
 void menuDraw(void)
 {
 	lcdClear();
-	if(menuStatus == 0) {
+	if(menuStatus == STATUS_SLEEP) {
 		// Draw Sleep
 		lcdPuts_p(0, 0, sleepStrings[0]);
 		lcdPuts_p(0, 1, sleepStrings[1]);
 	} else {
 		for(uint8_t y = 0; y < 2; y++) {
 			switch(menuStatus+y) {
-				case 1: // Draw Mode Menu
+				case STATUS_MODE: // Draw Mode Menu
 				lcdPuts_p(2, y, modeString);
 				break;
 
-				case 2: // Draw Mode
+				case STATUS_MODE+1: // Draw Mode
 				lcdPuts_p(0, y, menuModeStrings[menuMode]);
 				break;
 
-				case 3: // Draw Setting
+				case STATUS_SETTING+1: // Draw Setting
 				if(menuSetting == SETTING_BACK) {
 					// Back setting
 					lcdPuts_p(1, y, backString);
@@ -172,7 +191,7 @@ void menuDraw(void)
 				}
 				break;
 
-				case 4: // Draw Value
+				case STATUS_VALUE+1: // Draw Value
 				if(menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
 					if(menuSetting == SETTING_PROGRAM) {
 						lcdPutn(0, y, 8, settings.program);
