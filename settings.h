@@ -1,6 +1,8 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
+#include <stdint.h>
+
 enum MODE {
 	MODE_AUTO,
 	MODE_FIXED,
@@ -10,21 +12,23 @@ enum MODE {
 	MODE_SOUND
 };
 
-typedef union {
-	struct {
-		uint8_t red;
-		uint8_t green;
-		uint8_t blue;
+typedef struct {
+	union {
+		struct {
+			uint8_t red;
+			uint8_t green;
+			uint8_t blue;
+		};
+		uint8_t rgb[3];
 	};
-	uint8_t rgb[3];
 } tColor;
 
 typedef struct {
 	enum MODE mode;
 	uint8_t fade; /* 0 = Off, 1-255 = 0.1-25.5 seconds */
-	uint8_t toggleBPM; /* 0 = Off, 1-254 = BPM, 255 = SoundToLight */
+	uint8_t toggleBPM; /* 0 = Sound To Light, 1-255 = BPM */
 	tColor color[3];
-	uint16_t dmxChannel;
+	uint16_t dmxAddress;
 	uint8_t program;
 } tSettings;
 
@@ -32,5 +36,7 @@ union tSettingsData {
 	tSettings settings;
 	uint8_t data[sizeof(tSettings)];
 };
+
+extern tSettings settings;
 
 #endif

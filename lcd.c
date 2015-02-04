@@ -106,7 +106,7 @@ void lcdPuts(uint8_t x, uint8_t y, const char* string)
 	}
 }
 
-void lcdPuts_p(uint8_t x, uint8_t y, const char* string PROGMEM)
+void lcdPuts_p(uint8_t x, uint8_t y, PGM_P string)
 {
 	/* Simplified set address */
 	if(y) y = 0x40;
@@ -115,5 +115,46 @@ void lcdPuts_p(uint8_t x, uint8_t y, const char* string PROGMEM)
 	uint8_t c;
 	while(c = pgm_read_byte(string++)) {
 		lcdWriteData(c);
+	}
+}
+
+void lcdPutn(uint8_t x, uint8_t y, uint8_t width, uint8_t n)
+{
+	x += width - 1;
+	lcdPutc(x, y, '0' + (n % 10));
+	if(n /= 10 > 0) {
+		lcdPutc(--x, y, '0' + (n % 10));
+		if(n /= 10 > 0) {
+			lcdPutc(--x, y, '0' + (n % 10));
+		}
+	}
+}
+
+void lcdPutw(uint8_t x, uint8_t y, uint8_t width, uint16_t n)
+{
+	x += width - 1;
+	lcdPutc(x, y, '0' + (n % 10));
+	if(n /= 10 > 0) {
+		lcdPutc(--x, y, '0' + (n % 10));
+		if(n /= 10 > 0) {
+			lcdPutc(--x, y, '0' + (n % 10));
+			if(n /= 10 > 0) {
+				lcdPutc(--x, y, '0' + (n % 10));
+				if(n /= 10 > 0) {
+					lcdPutc(--x, y, '0' + (n % 10));
+				}
+			}
+		}
+	}
+}
+
+void lcdPutf(uint8_t x, uint8_t y, uint8_t width, uint8_t decimals, float n)
+{
+	uint8_t preDecimalWidth = width - decimals - 1;
+	lcdPutw(x, y, preDecimalWidth, (uint16_t) n);
+	lcdPutc(x += preDecimalWidth, y, '.');
+	while(decimals > 0) {
+		lcdPutc(++x, y, '0' + ((uint8_t)(n *= 10) % 10));
+		decimals--;
 	}
 }

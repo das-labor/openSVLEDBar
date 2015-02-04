@@ -1,3 +1,6 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
 #include "main.h"
 #include "lcd.h"
 #include "menu.h"
@@ -48,7 +51,7 @@ int main(void)
 	TCCR1B = (1 << CS11); // Prescaler 8
 	TCNT1H = 0x8A;
 	TCNT1L = 0xD0;
-	TIMSK1 |= (1 << TOIE1) | (1 << TOIE0);
+	TIMSK |= (1 << TOIE1) | (1 << TOIE0);
 	sei();
 
 	// Enable pull-up resistors for buttons
