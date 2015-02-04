@@ -113,7 +113,7 @@ void lcdPuts_p(uint8_t x, uint8_t y, PGM_P string)
 	lcdWriteCommand(0x80 | y | x);
 
 	uint8_t c;
-	while(c = pgm_read_byte(string++)) {
+	while((c = pgm_read_byte(string++))) {
 		lcdWriteData(c);
 	}
 }
