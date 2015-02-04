@@ -31,7 +31,7 @@ ISR(TIMER1_OVF_vect)
 	buttonValue |= ~(PIND | buttonStatus);
 	buttonStatus = ~PIND | (buttonStatus & buttonValue);
 
-	if(buttonValue & KEY_MENU) {
+	if(!(PIND & KEY_MENU)) {
 		if(longEnter < 50) {
 			longEnter++;
 		} else if(longEnter != 0xFF) {
@@ -42,7 +42,7 @@ ISR(TIMER1_OVF_vect)
 		longEnter = 0;
 	}
 
-	if(buttonValue & KEY_UP) {
+	if(!(PIND & KEY_UP)) {
 		if(longPrev < 50) {
 			longPrev++;
 		} else {
@@ -52,7 +52,7 @@ ISR(TIMER1_OVF_vect)
 		longPrev = 0;
 	}
 
-	if(buttonValue & KEY_DOWN) {
+	if(!(PIND & KEY_DOWN)) {
 		if(longNext < 50) {
 			longNext++;
 		} else {
@@ -93,12 +93,15 @@ int main(void)
 			sleepTimer = 1000; // Set timer to 10 seconds
 			if(buttonValue & KEY_MENU) {
 				menuEnter();
+				buttonValue &= ~KEY_MENU;
 			}
 			if(buttonValue & KEY_UP) {
 				menuNext();
+				buttonValue &= ~KEY_UP;
 			}
 			if(buttonValue & KEY_DOWN) {
 				menuPrev();
+				buttonValue &= ~KEY_DOWN;
 			}
 		}
 	}
