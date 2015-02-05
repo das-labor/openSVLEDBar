@@ -46,7 +46,7 @@ ISR(TIMER1_OVF_vect)
 		if(longPrev < 50) {
 			longPrev++;
 		} else {
-			menuRepeatedlyPrev();
+			menuPrev();
 		}
 	} else {
 		longPrev = 0;
@@ -56,7 +56,7 @@ ISR(TIMER1_OVF_vect)
 		if(longNext < 50) {
 			longNext++;
 		} else {
-			menuRepeatedlyNext();
+			menuNext();
 		}
 	} else {
 		longNext = 0;

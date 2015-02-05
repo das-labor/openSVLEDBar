@@ -141,17 +141,7 @@ void menuNext(void)
 
 }
 
-void menuRepeatedlyNext(void)
-{
-
-}
-
 void menuPrev(void)
-{
-
-}
-
-void menuRepeatedlyPrev(void)
 {
 
 }

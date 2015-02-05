@@ -35,8 +35,6 @@ void menuSleep(void);
 void menuEnter(void);
 void menuLongEnter(void);
 void menuNext(void);
-void menuRepeatedlyNext(void);
 void menuPrev(void);
-void menuRepeatedlyPrev(void);
 
 #endif
