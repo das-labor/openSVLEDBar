@@ -78,6 +78,8 @@ const char* const backString PROGMEM = "\x1e back";
 #define MENU_STRING_BACK		9
 #define MENU_STRING_FIRST_AUTO	10
 
+const uint8_t modeSettings[] = {3, 9, 1, 1, 0, 2};
+
 enum MODE menuMode;
 enum MENU_SETTING menuSetting;
 enum MENU_STATUS menuStatus;
@@ -138,12 +140,56 @@ void menuLongEnter(void)
 
 void menuNext(void)
 {
+	switch(menuStatus) {
+		case STATUS_SLEEP:
+			menuStatus = STATUS_MODE;
+			break;
 
+		case STATUS_MODE:
+			menuMode++;
+			if(menuMode == 6) {
+				menuMode = 0;
+			}
+			break;
+
+		case STATUS_SETTING:
+			menuSetting++;
+			if(menuSetting > modeSettings[menuMode]) {
+				menuSetting = 0;
+			}
+			break;
+
+		case STATUS_VALUE:
+			break;
+	}
+	menuDraw();
 }
 
 void menuPrev(void)
 {
+	switch(menuStatus) {
+		case STATUS_SLEEP:
+			menuStatus = STATUS_MODE;
+			break;
 
+		case STATUS_MODE:
+			if(menuMode == 0) {
+				menuMode = 6;
+			}
+			menuMode--;
+			break;
+
+		case STATUS_SETTING:
+			if(menuSetting == 0) {
+				menuSetting = modeSettings[menuMode] + 1;
+			}
+			menuSetting--;
+			break;
+
+		case STATUS_VALUE:
+			break;
+	}
+	menuDraw();
 }
 
 void menuDraw(void)
@@ -170,13 +216,24 @@ void menuDraw(void)
 					lcdPuts_p(1, y, backString);
 				} else {
 					// Other settings
-					if(menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
+					switch(menuMode) {
+						case MODE_AUTO:
+						case MODE_SOUND:
 						lcdPuts_p(0, y, autoModeStrings[menuSetting - 1]);
-					} else if(menuMode == MODE_FIXED) {
+						break;
+
+						case MODE_FIXED:
 						lcdPuts_p(0, y, colorStrings[(menuSetting - 1) % 3]);
 						lcdPutn(7, y, 1, (menuSetting - 1) / 3);
-					} else if(menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+						break;
+
+						case MODE_DMX3CH:
+						case MODE_DMX9CH:
 						lcdPuts_p(0, y, addressString);
+						break;
+
+						default:
+						break;
 					}
 				}
 				break;
