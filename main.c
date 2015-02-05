@@ -10,6 +10,22 @@
 #define KEY_UP		(1 << PD5)
 #define KEY_DOWN	(1 << PD6)
 
+uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
+uint16_t sleepTimer = 0, minuteTimer = 0;
+
+void uartPutc(uint8_t c)
+{
+	while(!(UCSRA & (1<<UDRE)));
+	UDR = c;
+}
+
+void uartPuts(char *str)
+{
+	while(*str) {
+		uartPutc(*str++);
+	}
+}
+
 /* Timer 0: 125kHz Software PWM */
 ISR(TIMER0_OVF_vect)
 {
@@ -17,9 +33,6 @@ ISR(TIMER0_OVF_vect)
 
 	/* TODO: Implement Software PWM for 9 Channels */
 }
-
-uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
-uint16_t sleepTimer = 0, minuteTimer = 0;
 
 /* Timer 1: 10ms */
 ISR(TIMER1_OVF_vect)
@@ -29,34 +42,27 @@ ISR(TIMER1_OVF_vect)
 
 	// Simple key debouncing
 	buttonValue |= ~(PIND | buttonStatus);
-	buttonStatus = ~PIND | (buttonStatus & buttonValue);
+	buttonStatus = (~PIND) | buttonStatus & buttonValue;
 
 	if(!(PIND & KEY_MENU)) {
 		if(longEnter < 50) {
 			longEnter++;
-		} else if(longEnter != 0xFF) {
-			menuLongEnter();
-			longEnter = 0xFF;
 		}
 	} else {
 		longEnter = 0;
 	}
 
 	if(!(PIND & KEY_UP)) {
-		if(longPrev < 50) {
+		if(longPrev <= 50) {
 			longPrev++;
-		} else {
-			menuPrev();
 		}
 	} else {
 		longPrev = 0;
 	}
 
 	if(!(PIND & KEY_DOWN)) {
-		if(longNext < 50) {
+		if(longNext <= 50) {
 			longNext++;
-		} else {
-			menuNext();
 		}
 	} else {
 		longNext = 0;
@@ -64,9 +70,6 @@ ISR(TIMER1_OVF_vect)
 
 	if(sleepTimer > 0) {
 		sleepTimer--;
-		if(sleepTimer == 0) {
-			menuSleep();
-		}
 	}
 
 	if(++minuteTimer >= 6000) {
@@ -92,22 +95,38 @@ int main(void)
 
 	// Enable pull-up resistors for buttons
 	PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
-	
+
+	DDRC = 0xFF;
+	DDRD |= (1 << PD7);
+
 	while(1) {
 		if(buttonValue & (KEY_MENU | KEY_UP | KEY_DOWN)) {
 			sleepTimer = 1000; // Set timer to 10 seconds
 			if(buttonValue & KEY_MENU) {
 				menuEnter();
-				buttonValue &= ~KEY_MENU;
 			}
 			if(buttonValue & KEY_UP) {
 				menuNext();
-				buttonValue &= ~KEY_UP;
 			}
 			if(buttonValue & KEY_DOWN) {
 				menuPrev();
-				buttonValue &= ~KEY_DOWN;
 			}
+			buttonValue &= ~(KEY_MENU | KEY_UP | KEY_DOWN);
+		}
+		if(longEnter == 50) {
+			menuLongEnter();
+			longEnter = 0xFF;
+		}
+		if(longPrev > 50) {
+			menuPrev();
+			longPrev = 50;
+		}
+		if(longNext > 50) {
+			menuNext();
+			longNext = 50;
+		}
+		if(sleepTimer == 1) {
+			menuSleep();
 		}
 	}
 	

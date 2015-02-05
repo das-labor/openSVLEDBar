@@ -35,14 +35,14 @@
 #include "lcd.h"
 #include "settings.h"
 
-const char* const sleepStrings[] PROGMEM = {
+const char sleepStrings[][9] PROGMEM = {
 	"OpenSVLB",
 	"by labor",
 };
 
-const char* const modeString PROGMEM = "Mode";
+const char modeString[] PROGMEM = "Mode";
 
-const char* const menuModeStrings[] PROGMEM = {
+const char menuModeStrings[][9] PROGMEM = {
 	"Auto",
 	"Fixed",
 	"DMX 3ch",
@@ -51,28 +51,28 @@ const char* const menuModeStrings[] PROGMEM = {
 	"Sound",
 };
 
-const char* const autoModeStrings[] PROGMEM = {
+const char autoModeStrings[][9] PROGMEM = {
 	"Program",
 	"Fade",
 	"Speed"
 };
 
-const char* const BPMString PROGMEM = "BPM";
+const char BPMString[] PROGMEM = "BPM";
 
-const char* const fadeStrings[] PROGMEM = {
+const char fadeStrings[][9] PROGMEM = {
 	"Off",
 	"sec"
 };
 
-const char* const colorStrings[] PROGMEM = {
+const char colorStrings[][9] PROGMEM = {
 	"Red",
 	"Green",
 	"Blue"
 };
 
-const char* const addressString PROGMEM = "Address";
+const char addressString[] PROGMEM = "Address";
 
-const char* const backString PROGMEM = "\x1e back";
+const char backString[] PROGMEM = "\x11 back";
 
 #define MENU_STRING_FIRST_MODE	3
 #define MENU_STRING_BACK		9
@@ -160,6 +160,25 @@ void menuNext(void)
 			break;
 
 		case STATUS_VALUE:
+			/*if(menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
+				if(menuSetting == SETTING_PROGRAM) {
+					lcdPutn(0, y, 8, settings.program);
+				} else if(menuSetting == SETTING_FADE) {
+					if(settings.fade == 0) {
+						lcdPuts_p(5, y, fadeStrings[0]);
+					} else {
+						lcdPutf(0, y, 4, 1, (float)settings.fade / 10.0f);
+						lcdPuts_p(5, y, fadeStrings[1]);
+					}
+				} else if(menuSetting == SETTING_SPEED) {
+					lcdPutn(0, y, 4, settings.toggleBPM);
+					lcdPuts_p(5, y, BPMString);
+				}
+			} else if(menuMode == MODE_FIXED) {
+				lcdPutn(0, y, 8, settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
+			} else if(menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+				lcdPutw(0, y, 8, settings.dmxAddress);
+			}*/
 			break;
 	}
 	menuDraw();
