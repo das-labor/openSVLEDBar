@@ -35,14 +35,14 @@
 #include "lcd.h"
 #include "settings.h"
 
-const char sleepStrings[][9] PROGMEM = {
+const char* const sleepStrings[] PROGMEM = {
 	"OpenSVLB",
 	"by labor",
 };
 
-const char modeString[] PROGMEM = "Mode";
+const char* const modeString PROGMEM = "Mode";
 
-const char menuModeStrings[][9] PROGMEM = {
+const char* const menuModeStrings[] PROGMEM = {
 	"Auto",
 	"Fixed",
 	"DMX 3ch",
@@ -51,28 +51,28 @@ const char menuModeStrings[][9] PROGMEM = {
 	"Sound",
 };
 
-const char autoModeStrings[][9] PROGMEM = {
+const char* const autoModeStrings[] PROGMEM = {
 	"Program",
 	"Fade",
 	"Speed"
 };
 
-const char BPMString[] PROGMEM = "BPM";
+const char* const BPMString PROGMEM = "BPM";
 
-const char fadeStrings[][9] PROGMEM = {
+const char* const fadeStrings[] PROGMEM = {
 	"Off",
 	"sec"
 };
 
-const char colorStrings[][9] PROGMEM = {
+const char* const colorStrings[] PROGMEM = {
 	"Red",
 	"Green",
 	"Blue"
 };
 
-const char addressString[] PROGMEM = "Address";
+const char* const addressString PROGMEM = "Address";
 
-const char backString[] PROGMEM = "\x1e back";
+const char* const backString PROGMEM = "\x1e back";
 
 #define MENU_STRING_FIRST_MODE	3
 #define MENU_STRING_BACK		9

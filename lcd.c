@@ -106,7 +106,7 @@ void lcdPuts(uint8_t x, uint8_t y, const char* string)
 	}
 }
 
-void lcdPuts_p(uint8_t x, uint8_t y, PGM_P string)
+void lcdPuts_p(uint8_t x, uint8_t y, const char* string)
 {
 	/* Simplified set address */
 	if(y) y = 0x40;
