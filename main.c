@@ -19,7 +19,7 @@ ISR(TIMER0_OVF_vect)
 }
 
 uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
-uint16_t sleepTimer = 0;
+uint16_t sleepTimer = 0, minuteTimer = 0;
 
 /* Timer 1: 10ms */
 ISR(TIMER1_OVF_vect)
@@ -67,6 +67,11 @@ ISR(TIMER1_OVF_vect)
 		if(sleepTimer == 0) {
 			menuSleep();
 		}
+	}
+
+	if(++minuteTimer >= 6000) {
+		/* Implement features that need to be run each minute (i.e. update operating minutes) */
+		minuteTimer = 0;
 	}
 }
 
