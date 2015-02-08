@@ -98,13 +98,13 @@ void menuSleep(void)
 
 void menuEnter(void)
 {
-	switch(menuStatus) {
+	switch (menuStatus) {
 		case STATUS_SLEEP:
 		menuStatus = STATUS_MODE;
 		break;
 
 		case STATUS_MODE:
-		if(menuMode == MODE_SLAVE) {
+		if (menuMode == MODE_SLAVE) {
 			menuSetting = SETTING_BACK; // Slave mode only has back
 		} else {
 			menuSetting = 1; // Skip back
@@ -113,7 +113,7 @@ void menuEnter(void)
 		break;
 
 		case STATUS_SETTING:
-		if(menuSetting == SETTING_BACK) {
+		if (menuSetting == SETTING_BACK) {
 			menuStatus = STATUS_MODE;
 		} else {
 			menuStatus = STATUS_VALUE;
@@ -130,7 +130,7 @@ void menuEnter(void)
 void menuLongEnter(void)
 {
 	// Long Enter goes back to the main Menu or to Sleep mode when there
-	if(menuStatus > STATUS_MODE) {
+	if (menuStatus > STATUS_MODE) {
 		menuStatus = STATUS_MODE;
 	} else {
 		menuStatus = STATUS_SLEEP;
@@ -140,21 +140,21 @@ void menuLongEnter(void)
 
 void menuNext(void)
 {
-	switch(menuStatus) {
+	switch (menuStatus) {
 		case STATUS_SLEEP:
 			menuStatus = STATUS_MODE;
 			break;
 
 		case STATUS_MODE:
 			menuMode++;
-			if(menuMode == 6) {
+			if (menuMode == 6) {
 				menuMode = 0;
 			}
 			break;
 
 		case STATUS_SETTING:
 			menuSetting++;
-			if(menuSetting > modeSettings[menuMode]) {
+			if (menuSetting > modeSettings[menuMode]) {
 				menuSetting = 0;
 			}
 			break;
@@ -186,20 +186,20 @@ void menuNext(void)
 
 void menuPrev(void)
 {
-	switch(menuStatus) {
+	switch (menuStatus) {
 		case STATUS_SLEEP:
 			menuStatus = STATUS_MODE;
 			break;
 
 		case STATUS_MODE:
-			if(menuMode == 0) {
+			if (menuMode == 0) {
 				menuMode = 6;
 			}
 			menuMode--;
 			break;
 
 		case STATUS_SETTING:
-			if(menuSetting == 0) {
+			if (menuSetting == 0) {
 				menuSetting = modeSettings[menuMode] + 1;
 			}
 			menuSetting--;
@@ -214,13 +214,13 @@ void menuPrev(void)
 void menuDraw(void)
 {
 	lcdClear();
-	if(menuStatus == STATUS_SLEEP) {
+	if (menuStatus == STATUS_SLEEP) {
 		// Draw Sleep
 		lcdPuts_p(0, 0, sleepStrings[0]);
 		lcdPuts_p(0, 1, sleepStrings[1]);
 	} else {
-		for(uint8_t y = 0; y < 2; y++) {
-			switch(menuStatus+y) {
+		for (uint8_t y = 0; y < 2; y++) {
+			switch (menuStatus+y) {
 				case STATUS_MODE: // Draw Mode Menu
 				lcdPuts_p(2, y, modeString);
 				break;
@@ -230,12 +230,12 @@ void menuDraw(void)
 				break;
 
 				case STATUS_SETTING+1: // Draw Setting
-				if(menuSetting == SETTING_BACK) {
+				if (menuSetting == SETTING_BACK) {
 					// Back setting
 					lcdPuts_p(1, y, backString);
 				} else {
 					// Other settings
-					switch(menuMode) {
+					switch (menuMode) {
 						case MODE_AUTO:
 						case MODE_SOUND:
 						lcdPuts_p(0, y, autoModeStrings[menuSetting - 1]);
@@ -258,23 +258,23 @@ void menuDraw(void)
 				break;
 
 				case STATUS_VALUE+1: // Draw Value
-				if(menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
-					if(menuSetting == SETTING_PROGRAM) {
+				if (menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
+					if (menuSetting == SETTING_PROGRAM) {
 						lcdPutn(0, y, 8, settings.program);
-					} else if(menuSetting == SETTING_FADE) {
-						if(settings.fade == 0) {
+					} else if (menuSetting == SETTING_FADE) {
+						if (settings.fade == 0) {
 							lcdPuts_p(5, y, fadeStrings[0]);
 						} else {
 							lcdPutf(0, y, 4, 1, (float)settings.fade / 10.0f);
 							lcdPuts_p(5, y, fadeStrings[1]);
 						}
-					} else if(menuSetting == SETTING_SPEED) {
+					} else if (menuSetting == SETTING_SPEED) {
 						lcdPutn(0, y, 4, settings.toggleBPM);
 						lcdPuts_p(5, y, BPMString);
 					}
- 				} else if(menuMode == MODE_FIXED) {
+ 				} else if (menuMode == MODE_FIXED) {
  					lcdPutn(0, y, 8, settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
- 				} else if(menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+ 				} else if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
  					lcdPutw(0, y, 8, settings.dmxAddress);
  				}
 				break;

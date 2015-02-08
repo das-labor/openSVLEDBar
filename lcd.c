@@ -44,14 +44,14 @@ void lcdWaitBusyFlag(void)
 {
 	uint8_t i = 0;
 	/* Wait for busy flag */
-	while(i++ < 255) {
+	while (i++ < 255) {
 		PORTA = 0xFF;
 		PORTB &= ~LCD_RS;
 		PORTB |= LCD_RW;
 		DDRA = 0x00;
 		PORTB |= LCD_EN;
 		_delay_ms(1);
-		if(!(PINA & (1 << PA7))) {
+		if (!(PINA & (1 << PA7))) {
 			break;
 		}
 	}
@@ -101,7 +101,7 @@ void lcdPuts(uint8_t x, uint8_t y, const char* string)
 	if(y) y = 0x40;
 	lcdWriteCommand(0x80 | y | x);
 
-	while(*string != 0) {
+	while (*string != 0) {
 		lcdWriteData(*string++);
 	}
 }
@@ -113,7 +113,7 @@ void lcdPuts_p(uint8_t x, uint8_t y, const char* string)
 	lcdWriteCommand(0x80 | y | x);
 
 	uint8_t c;
-	while((c = pgm_read_byte(string++))) {
+	while ((c = pgm_read_byte(string++))) {
 		lcdWriteData(c);
 	}
 }
@@ -122,9 +122,9 @@ void lcdPutn(uint8_t x, uint8_t y, uint8_t width, uint8_t n)
 {
 	x += width - 1;
 	lcdPutc(x, y, '0' + (n % 10));
-	if(n /= 10 > 0) {
+	if (n /= 10 > 0) {
 		lcdPutc(--x, y, '0' + (n % 10));
-		if(n /= 10 > 0) {
+		if (n /= 10 > 0) {
 			lcdPutc(--x, y, '0' + (n % 10));
 		}
 	}
@@ -134,13 +134,13 @@ void lcdPutw(uint8_t x, uint8_t y, uint8_t width, uint16_t n)
 {
 	x += width - 1;
 	lcdPutc(x, y, '0' + (n % 10));
-	if(n /= 10 > 0) {
+	if (n /= 10 > 0) {
 		lcdPutc(--x, y, '0' + (n % 10));
-		if(n /= 10 > 0) {
+		if (n /= 10 > 0) {
 			lcdPutc(--x, y, '0' + (n % 10));
-			if(n /= 10 > 0) {
+			if (n /= 10 > 0) {
 				lcdPutc(--x, y, '0' + (n % 10));
-				if(n /= 10 > 0) {
+				if (n /= 10 > 0) {
 					lcdPutc(--x, y, '0' + (n % 10));
 				}
 			}
@@ -153,7 +153,7 @@ void lcdPutf(uint8_t x, uint8_t y, uint8_t width, uint8_t decimals, float n)
 	uint8_t preDecimalWidth = width - decimals - 1;
 	lcdPutw(x, y, preDecimalWidth, (uint16_t) n);
 	lcdPutc(x += preDecimalWidth, y, '.');
-	while(decimals > 0) {
+	while (decimals > 0) {
 		lcdPutc(++x, y, '0' + ((uint8_t)(n *= 10) % 10));
 		decimals--;
 	}

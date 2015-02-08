@@ -15,13 +15,13 @@ uint16_t sleepTimer = 0, minuteTimer = 0;
 
 void uartPutc(uint8_t c)
 {
-	while(!(UCSRA & (1<<UDRE)));
+	while (!(UCSRA & (1<<UDRE)));
 	UDR = c;
 }
 
 void uartPuts(char *str)
 {
-	while(*str) {
+	while (*str) {
 		uartPutc(*str++);
 	}
 }
@@ -44,35 +44,35 @@ ISR(TIMER1_OVF_vect)
 	buttonValue |= ~(PIND | buttonStatus);
 	buttonStatus = (~PIND) | buttonStatus & buttonValue;
 
-	if(!(PIND & KEY_MENU)) {
-		if(longEnter < 50) {
+	if (!(PIND & KEY_MENU)) {
+		if (longEnter < 50) {
 			longEnter++;
 		}
 	} else {
 		longEnter = 0;
 	}
 
-	if(!(PIND & KEY_UP)) {
-		if(longPrev <= 50) {
+	if (!(PIND & KEY_UP)) {
+		if (longPrev <= 50) {
 			longPrev++;
 		}
 	} else {
 		longPrev = 0;
 	}
 
-	if(!(PIND & KEY_DOWN)) {
-		if(longNext <= 50) {
+	if (!(PIND & KEY_DOWN)) {
+		if (longNext <= 50) {
 			longNext++;
 		}
 	} else {
 		longNext = 0;
 	}
 
-	if(sleepTimer > 0) {
+	if (sleepTimer > 0) {
 		sleepTimer--;
 	}
 
-	if(++minuteTimer >= 6000) {
+	if (++minuteTimer >= 6000) {
 		/* Implement features that need to be run each minute (i.e. update operating minutes) */
 		minuteTimer = 0;
 	}
@@ -99,33 +99,33 @@ int main(void)
 	DDRC = 0xFF;
 	DDRD |= (1 << PD7);
 
-	while(1) {
-		if(buttonValue & (KEY_MENU | KEY_UP | KEY_DOWN)) {
+	while (1) {
+		if (buttonValue & (KEY_MENU | KEY_UP | KEY_DOWN)) {
 			sleepTimer = 1000; // Set timer to 10 seconds
-			if(buttonValue & KEY_MENU) {
+			if (buttonValue & KEY_MENU) {
 				menuEnter();
 			}
-			if(buttonValue & KEY_UP) {
+			if (buttonValue & KEY_UP) {
 				menuNext();
 			}
-			if(buttonValue & KEY_DOWN) {
+			if (buttonValue & KEY_DOWN) {
 				menuPrev();
 			}
 			buttonValue &= ~(KEY_MENU | KEY_UP | KEY_DOWN);
 		}
-		if(longEnter == 50) {
+		if (longEnter == 50) {
 			menuLongEnter();
 			longEnter = 0xFF;
 		}
-		if(longPrev > 50) {
+		if (longPrev > 50) {
 			menuPrev();
 			longPrev = 50;
 		}
-		if(longNext > 50) {
+		if (longNext > 50) {
 			menuNext();
 			longNext = 50;
 		}
-		if(sleepTimer == 1) {
+		if (sleepTimer == 1) {
 			menuSleep();
 		}
 	}
