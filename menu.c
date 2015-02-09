@@ -203,6 +203,9 @@ void menuNext(void)
 						settings.dmxAddress++;
 					}
 					break;
+
+				default:
+					break;
 			}
 			break;
 	}

@@ -122,9 +122,11 @@ void lcdPutn(uint8_t x, uint8_t y, uint8_t width, uint8_t n)
 {
 	x += width - 1;
 	lcdPutc(x, y, '0' + (n % 10));
-	if (n /= 10 > 0) {
+	n = n / 10;
+	if (n > 0) {
 		lcdPutc(--x, y, '0' + (n % 10));
-		if (n /= 10 > 0) {
+		n = n / 10;
+		if (n > 0) {
 			lcdPutc(--x, y, '0' + (n % 10));
 		}
 	}
@@ -134,13 +136,17 @@ void lcdPutw(uint8_t x, uint8_t y, uint8_t width, uint16_t n)
 {
 	x += width - 1;
 	lcdPutc(x, y, '0' + (n % 10));
-	if (n /= 10 > 0) {
+	n = n / 10;
+	if (n > 0) {
 		lcdPutc(--x, y, '0' + (n % 10));
-		if (n /= 10 > 0) {
+		n = n / 10;
+		if (n > 0) {
 			lcdPutc(--x, y, '0' + (n % 10));
-			if (n /= 10 > 0) {
+			n = n / 10;
+			if (n > 0) {
 				lcdPutc(--x, y, '0' + (n % 10));
-				if (n /= 10 > 0) {
+				n = n / 10;
+				if (n > 0) {
 					lcdPutc(--x, y, '0' + (n % 10));
 				}
 			}
@@ -154,7 +160,8 @@ void lcdPutf(uint8_t x, uint8_t y, uint8_t width, uint8_t decimals, float n)
 	lcdPutw(x, y, preDecimalWidth, (uint16_t) n);
 	lcdPutc(x += preDecimalWidth, y, '.');
 	while (decimals > 0) {
-		lcdPutc(++x, y, '0' + ((uint8_t)(n *= 10) % 10));
+		n = n * 10;
+		lcdPutc(++x, y, '0' + (uint8_t)n % 10);
 		decimals--;
 	}
 }
