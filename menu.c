@@ -37,7 +37,7 @@
 
 const char sleepStrings[][9] PROGMEM = {
 	"OpenSVLB",
-	"by labor",
+	"by labor"
 };
 
 const char modeString[] PROGMEM = "Mode";
@@ -48,7 +48,7 @@ const char menuModeStrings[][9] PROGMEM = {
 	"DMX 3ch",
 	"DMX 9ch",
 	"Slave",
-	"Sound",
+	"Sound"
 };
 
 const char autoModeStrings[][9] PROGMEM = {
@@ -72,7 +72,7 @@ const char colorStrings[][9] PROGMEM = {
 
 const char addressString[] PROGMEM = "Address";
 
-const char backString[] PROGMEM = "\x11 back";
+const char backString[] PROGMEM = "\x7f back";
 
 #define MENU_STRING_FIRST_MODE	3
 #define MENU_STRING_BACK		9
@@ -82,7 +82,7 @@ const uint8_t modeSettings[] = {3, 9, 1, 1, 0, 2};
 
 enum MODE menuMode;
 enum MENU_SETTING menuSetting;
-enum MENU_STATUS menuStatus;
+enum MENU_STATUS menuStatus, lastMenuStatus;
 /*
  * status = 0: Sleep
  * status = 1: Select Mode e.g. DMX 9ch
@@ -98,6 +98,7 @@ void menuSleep(void)
 
 void menuEnter(void)
 {
+	lastMenuStatus = menuStatus;
 	switch (menuStatus) {
 		case STATUS_SLEEP:
 		menuStatus = STATUS_MODE;
@@ -136,11 +137,12 @@ void menuEnter(void)
 void menuLongEnter(void)
 {
 	// Long Enter goes back to the main Menu or to Sleep mode when there
-	if (menuStatus > STATUS_MODE) {
+	if (lastMenuStatus > STATUS_MODE) {
 		menuStatus = STATUS_MODE;
 	} else {
 		menuStatus = STATUS_SLEEP;
 	}
+	lastMenuStatus = menuStatus;
 	menuDraw();
 }
 

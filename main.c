@@ -53,7 +53,7 @@ ISR(TIMER1_OVF_vect)
 	}
 
 	if (!(PIND & KEY_UP)) {
-		if (longNext <= 50) {
+		if (longNext < 54) {
 			longNext++;
 		}
 	} else {
@@ -61,7 +61,7 @@ ISR(TIMER1_OVF_vect)
 	}
 
 	if (!(PIND & KEY_DOWN)) {
-		if (longPrev <= 50) {
+		if (longPrev < 54) {
 			longPrev++;
 		}
 	} else {
@@ -94,7 +94,7 @@ int main(void)
 	sei();
 
 	// Enable pull-up resistors for buttons
-	PORTD |= (1 << PD4) | (1 << PD5) | (1 << PD6);
+	PORTD |= KEY_MENU | KEY_UP | KEY_DOWN;
 
 	DDRC = 0xFF;
 	DDRD |= (1 << PD7);
@@ -113,20 +113,22 @@ int main(void)
 			}
 			buttonValue &= ~(KEY_MENU | KEY_UP | KEY_DOWN);
 		}
+		if ((~PIND) & (KEY_MENU | KEY_UP | KEY_DOWN)) {
+			sleepTimer = 1000; // Set timer to 10 seconds
+		} else if (sleepTimer == 1) {
+			menuSleep();
+		}
 		if (longEnter == 50) {
 			menuLongEnter();
 			longEnter = 0xFF;
 		}
-		if (longPrev > 50) {
+		if (longPrev >= 54) {
 			menuPrev();
 			longPrev = 50;
 		}
-		if (longNext > 50) {
+		if (longNext >= 54) {
 			menuNext();
 			longNext = 50;
-		}
-		if (sleepTimer == 1) {
-			menuSleep();
 		}
 	}
 	
