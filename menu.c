@@ -34,6 +34,7 @@
 #include "menu.h"
 #include "lcd.h"
 #include "settings.h"
+#include "main.h"
 
 const char sleepStrings[][9] PROGMEM = {
 	"OpenSVLB",
@@ -189,8 +190,8 @@ void menuNext(void)
 					break;
 
 				case MODE_FIXED:
-					if (settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] < 255) {
-						settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]++;
+					if (color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] < 255) {
+						color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]++;
 					}
 					break;
 
@@ -257,8 +258,8 @@ void menuPrev(void)
 					break;
 
 				case MODE_FIXED:
-					if (settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] > 0) {
-						settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]--;
+					if (color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] > 0) {
+						color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]--;
 					}
 					break;
 
@@ -339,7 +340,7 @@ void menuDraw(void)
 						lcdPuts_p(5, y, BPMString);
 					}
  				} else if (menuMode == MODE_FIXED) {
- 					lcdPutn(0, y, 8, settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
+ 					lcdPutn(0, y, 8, color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
  				} else if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
  					lcdPutw(0, y, 8, settings.dmxAddress);
  				}

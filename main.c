@@ -4,7 +4,6 @@
 #include "main.h"
 #include "lcd.h"
 #include "menu.h"
-#include "settings.h"
 
 #define KEY_MENU	(1 << PD4)
 #define KEY_UP		(1 << PD5)
@@ -12,6 +11,9 @@
 
 uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
 uint16_t sleepTimer = 0, minuteTimer = 0;
+uint8_t pwmClock;
+
+tColor color[3];
 
 void uartPutc(uint8_t c)
 {
@@ -31,7 +33,53 @@ ISR(TIMER0_OVF_vect)
 {
 	TCNT0 = 0xE8;
 
-	/* TODO: Implement Software PWM for 9 Channels */
+	if (pwmClock < color[0].rgb[0]) {
+		PORTC |= (1 << PC7);
+	} else {
+		PORTC &= ~(1 << PC7);
+	}
+	if (pwmClock < color[0].rgb[1]) {
+		PORTC |= (1 << PC6);
+	} else {
+		PORTC &= ~(1 << PC6);
+	}
+	if (pwmClock < color[0].rgb[2]) {
+		PORTC |= (1 << PC5);
+	} else {
+		PORTC &= ~(1 << PC5);
+	}
+	if (pwmClock < color[1].rgb[0]) {
+		PORTC |= (1 << PC4);
+	} else {
+		PORTC &= ~(1 << PC4);
+	}
+	if (pwmClock < color[1].rgb[1]) {
+		PORTC |= (1 << PC3);
+	} else {
+		PORTC &= ~(1 << PC3);
+	}
+	if (pwmClock < color[1].rgb[2]) {
+		PORTC |= (1 << PC2);
+	} else {
+		PORTC &= ~(1 << PC2);
+	}
+	if (pwmClock < color[2].rgb[0]) {
+		PORTC |= (1 << PC1);
+	} else {
+		PORTC &= ~(1 << PC1);
+	}
+	if (pwmClock < color[2].rgb[1]) {
+		PORTC |= (1 << PC0);
+	} else {
+		PORTC &= ~(1 << PC0);
+	}
+	if (pwmClock < color[2].rgb[2]) {
+		PORTD |= (1 << PD7);
+	} else {
+		PORTD &= ~(1 << PD7);
+	}
+
+	pwmClock++;
 }
 
 /* Timer 1: 10ms */
@@ -53,7 +101,7 @@ ISR(TIMER1_OVF_vect)
 	}
 
 	if (!(PIND & KEY_UP)) {
-		if (longNext < 54) {
+		if (longNext < 50) {
 			longNext++;
 		}
 	} else {
@@ -61,7 +109,7 @@ ISR(TIMER1_OVF_vect)
 	}
 
 	if (!(PIND & KEY_DOWN)) {
-		if (longPrev < 54) {
+		if (longPrev < 50) {
 			longPrev++;
 		}
 	} else {
@@ -80,6 +128,10 @@ ISR(TIMER1_OVF_vect)
 
 int main(void)
 {
+	// Enable LED Ports
+	DDRC = 0xFF;
+	DDRD |= (1 << PD7);
+
 	initLCD();
 	menuSleep();
 
@@ -96,9 +148,6 @@ int main(void)
 	// Enable pull-up resistors for buttons
 	PORTD |= KEY_MENU | KEY_UP | KEY_DOWN;
 
-	DDRC = 0xFF;
-	DDRD |= (1 << PD7);
-
 	while (1) {
 		if (buttonValue & (KEY_MENU | KEY_UP | KEY_DOWN)) {
 			sleepTimer = 1000; // Set timer to 10 seconds
@@ -112,24 +161,35 @@ int main(void)
 				menuPrev();
 			}
 			buttonValue &= ~(KEY_MENU | KEY_UP | KEY_DOWN);
+		} else {
+			if ((~PIND) & (KEY_MENU | KEY_UP | KEY_DOWN)) {
+				sleepTimer = 1000; // Set timer to 10 seconds
+			} else if (sleepTimer == 1) {
+				menuSleep();
+			}
+			if (longEnter == 50) {
+				menuLongEnter();
+				longEnter = 0xFF;
+			}
+			if (longPrev >= 50) {
+				menuPrev();
+				longPrev = 48;
+			}
+			if (longNext >= 50) {
+				menuNext();
+				longNext = 48;
+			}
 		}
-		if ((~PIND) & (KEY_MENU | KEY_UP | KEY_DOWN)) {
-			sleepTimer = 1000; // Set timer to 10 seconds
-		} else if (sleepTimer == 1) {
-			menuSleep();
-		}
-		if (longEnter == 50) {
-			menuLongEnter();
-			longEnter = 0xFF;
-		}
-		if (longPrev >= 54) {
-			menuPrev();
-			longPrev = 50;
-		}
-		if (longNext >= 54) {
-			menuNext();
-			longNext = 50;
-		}
+
+		/* TODO
+			if (menuStatus <= STATUS_SETTING) {
+				// save settings
+				settings.mode = menuMode;
+				settings.color[0] = color[0];
+				settings.color[1] = color[1];
+				settings.color[2] = color[2];
+			}
+		*/
 	}
 	
 }
