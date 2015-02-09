@@ -42,7 +42,7 @@ ISR(TIMER1_OVF_vect)
 
 	// Simple key debouncing
 	buttonValue |= ~(PIND | buttonStatus);
-	buttonStatus = (~PIND) | buttonStatus & buttonValue;
+	buttonStatus = (~PIND) | (buttonStatus & buttonValue);
 
 	if (!(PIND & KEY_MENU)) {
 		if (longEnter < 50) {

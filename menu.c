@@ -109,6 +109,12 @@ void menuEnter(void)
 		} else {
 			menuSetting = 1; // Skip back
 		}
+
+		// Validity check of the selected DMX-Channel
+		if (menuMode == MODE_DMX9CH && settings.dmxAddress > 504) {
+			settings.dmxAddress = 504;
+		}
+
 		menuStatus = STATUS_SETTING;
 		break;
 
@@ -160,25 +166,44 @@ void menuNext(void)
 			break;
 
 		case STATUS_VALUE:
-			/*if(menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
-				if(menuSetting == SETTING_PROGRAM) {
-					lcdPutn(0, y, 8, settings.program);
-				} else if(menuSetting == SETTING_FADE) {
-					if(settings.fade == 0) {
-						lcdPuts_p(5, y, fadeStrings[0]);
-					} else {
-						lcdPutf(0, y, 4, 1, (float)settings.fade / 10.0f);
-						lcdPuts_p(5, y, fadeStrings[1]);
+			switch (menuMode) {
+				case MODE_AUTO:
+				case MODE_SOUND:
+					if (menuSetting == SETTING_PROGRAM) {
+						if (settings.program < NUMBER_PROGRAMS - 1) {
+							settings.program++;
+						} else {
+							settings.program = 0;
+						}
+					} else if (menuSetting == SETTING_FADE) {
+						if (settings.fade < 255) {
+							settings.fade++;
+						}
+					} else if (menuSetting == SETTING_SPEED) {
+						if (settings.toggleBPM < 255) {
+							settings.toggleBPM++;
+						}
 					}
-				} else if(menuSetting == SETTING_SPEED) {
-					lcdPutn(0, y, 4, settings.toggleBPM);
-					lcdPuts_p(5, y, BPMString);
-				}
-			} else if(menuMode == MODE_FIXED) {
-				lcdPutn(0, y, 8, settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
-			} else if(menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
-				lcdPutw(0, y, 8, settings.dmxAddress);
-			}*/
+					break;
+
+				case MODE_FIXED:
+					if (settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] < 255) {
+						settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]++;
+					}
+					break;
+
+				case MODE_DMX3CH:
+					if (settings.dmxAddress < 510) {
+						settings.dmxAddress++;
+					}
+					break;
+
+				case MODE_DMX9CH:
+					if (settings.dmxAddress < 504) {
+						settings.dmxAddress++;
+					}
+					break;
+			}
 			break;
 	}
 	menuDraw();
@@ -206,6 +231,42 @@ void menuPrev(void)
 			break;
 
 		case STATUS_VALUE:
+			switch (menuMode) {
+				case MODE_AUTO:
+				case MODE_SOUND:
+					if (menuSetting == SETTING_PROGRAM) {
+						if (settings.program > 0) {
+							settings.program--;
+						} else {
+							settings.program = NUMBER_PROGRAMS - 1;
+						}
+					} else if (menuSetting == SETTING_FADE) {
+						if (settings.fade > 0) {
+							settings.fade--;
+						}
+					} else if (menuSetting == SETTING_SPEED) {
+						if (settings.toggleBPM > 1) {
+							settings.toggleBPM--;
+						}
+					}
+					break;
+
+				case MODE_FIXED:
+					if (settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] > 0) {
+						settings.color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]--;
+					}
+					break;
+
+				case MODE_DMX3CH:
+				case MODE_DMX9CH:
+					if (settings.dmxAddress > 1) {
+						settings.dmxAddress--;
+					}
+					break;
+
+				default:
+					break;
+			}
 			break;
 	}
 	menuDraw();
@@ -260,7 +321,7 @@ void menuDraw(void)
 				case STATUS_VALUE+1: // Draw Value
 				if (menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
 					if (menuSetting == SETTING_PROGRAM) {
-						lcdPutn(0, y, 8, settings.program);
+						lcdPutn(0, y, 8, settings.program + 1);
 					} else if (menuSetting == SETTING_FADE) {
 						if (settings.fade == 0) {
 							lcdPuts_p(5, y, fadeStrings[0]);

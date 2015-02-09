@@ -23,10 +23,12 @@ typedef struct {
 	};
 } tColor;
 
+#define NUMBER_PROGRAMS 5
+
 typedef struct {
 	enum MODE mode;
 	uint8_t fade; /* 0 = Off, 1-255 = 0.1-25.5 seconds */
-	uint8_t toggleBPM; /* 0 = Sound To Light, 1-255 = BPM */
+	uint8_t toggleBPM; /* 0 = Off, 1-255 = BPM */
 	tColor color[3];
 	uint16_t dmxAddress;
 	uint8_t program;
