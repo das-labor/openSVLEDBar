@@ -53,19 +53,19 @@ ISR(TIMER1_OVF_vect)
 	}
 
 	if (!(PIND & KEY_UP)) {
-		if (longPrev <= 50) {
-			longPrev++;
-		}
-	} else {
-		longPrev = 0;
-	}
-
-	if (!(PIND & KEY_DOWN)) {
 		if (longNext <= 50) {
 			longNext++;
 		}
 	} else {
 		longNext = 0;
+	}
+
+	if (!(PIND & KEY_DOWN)) {
+		if (longPrev <= 50) {
+			longPrev++;
+		}
+	} else {
+		longPrev = 0;
 	}
 
 	if (sleepTimer > 0) {
