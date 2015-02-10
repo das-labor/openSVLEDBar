@@ -43,6 +43,6 @@ The Pinout is printed on the circuit board. It is as follows:
 
 ### External ISP Connector hack
 
-![Picture of external ISP connector](master/doc/ext-isp-1.jpg "External ISP connector fixed on the back of the PCB")
+![Picture of external ISP connector](doc/ext-isp-1.jpg "External ISP connector fixed on the back of the PCB")
 
-![Picture of external ISP connector](master/doc/ext-isp-2.jpg "How it looks outside the case")
+![Picture of external ISP connector](doc/ext-isp-2.jpg "How it looks outside the case")
