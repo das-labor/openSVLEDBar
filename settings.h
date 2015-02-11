@@ -14,6 +14,8 @@ typedef enum {
 
 #define NUMBER_MODES 6
 
+#define SET_COLOR(c, r, g, b) c.red = (r); c.green = (g); c.blue = (b);
+
 typedef struct {
 	union {
 		struct {
@@ -22,6 +24,7 @@ typedef struct {
 			uint8_t blue;
 		};
 		uint8_t rgb[3];
+		uint32_t data : 24;
 	};
 } tColor;
 

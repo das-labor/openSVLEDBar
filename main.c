@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
 
 #include "settings.h"
 #include "main.h"
@@ -11,14 +12,14 @@
 #define KEY_DOWN	(1 << PD6)
 
 uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
-uint16_t sleepTimer = 0, minuteTimer = 0, bpmTimer = 0;
+uint16_t sleepTimer = 0, minuteTimer = 0, bpmTimer;
 uint8_t pwmClock, timerTicks = 0;
 
 extern tMode menuMode;
 extern tSettings settings;
 extern uint16_t bpmTime;
 
-tColor color[3];
+tColor color[3], fadeColor[3];
 
 void uartPutc(uint8_t c)
 {
@@ -164,36 +165,50 @@ int main(void)
 				}
 
 				if (menuMode == MODE_AUTO) {
-					switch (animationState) {
-						case 0:
-							color[1].rgb[1] = 0;
-							if (color[2].rgb[2] > 0) {
-								color[2].rgb[2]--;
-							}
-							if (color[0].rgb[0] < 255) {
-								color[0].rgb[0]++;
-							}
-							break;
-						case 1:
-							color[2].rgb[2] = 0;
-							if (color[0].rgb[0] > 0) {
-								color[0].rgb[0]--;
-							}
-							if (color[1].rgb[1] < 255) {
-								color[1].rgb[1]++;
-							}
-							break;
-						case 2:
-							color[0].rgb[0] = 0;
-							if (color[1].rgb[1] > 0) {
-								color[1].rgb[1]--;
-							}
-							if (color[2].rgb[2] < 255) {
-								color[2].rgb[2]++;
-							}
-							break;
-						default:
-							break;
+					if (color[0].red < fadeColor[0].red) {
+						color[0].red++;
+					} else if (color[0].red > fadeColor[0].red) {
+						color[0].red--;
+					}
+					if (color[0].green < fadeColor[0].green) {
+						color[0].green++;
+					} else if (color[0].green > fadeColor[0].green) {
+						color[0].green--;
+					}
+					if (color[0].blue < fadeColor[0].blue) {
+						color[0].blue++;
+					} else if (color[0].blue > fadeColor[0].blue) {
+						color[0].blue--;
+					}
+					if (color[1].red < fadeColor[1].red) {
+						color[1].red++;
+					} else if (color[1].red > fadeColor[1].red) {
+						color[1].red--;
+					}
+					if (color[1].green < fadeColor[1].green) {
+						color[1].green++;
+					} else if (color[1].green > fadeColor[1].green) {
+						color[1].green--;
+					}
+					if (color[1].blue < fadeColor[1].blue) {
+						color[1].blue++;
+					} else if (color[1].blue > fadeColor[1].blue) {
+						color[1].blue--;
+					}
+					if (color[2].red < fadeColor[2].red) {
+						color[2].red++;
+					} else if (color[2].red > fadeColor[2].red) {
+						color[2].red--;
+					}
+					if (color[2].green < fadeColor[2].green) {
+						color[2].green++;
+					} else if (color[2].green > fadeColor[2].green) {
+						color[2].green--;
+					}
+					if (color[2].blue < fadeColor[2].blue) {
+						color[2].blue++;
+					} else if (color[2].blue > fadeColor[2].blue) {
+						color[2].blue--;
 					}
 				}
 
@@ -238,9 +253,109 @@ int main(void)
 		if (bpmTimer == 0) {
 			if (menuMode == MODE_AUTO) {
 				bpmTimer = bpmTime;
-				animationState++;
-				if (animationState == 3) {
-					animationState = 0;
+				switch (settings.program) {
+					case 0:
+						animationState++;
+						switch (animationState) {
+							case 0:
+								SET_COLOR(fadeColor[0], 255, 0, 0);
+								SET_COLOR(color[1], 0, 0, 0);
+								SET_COLOR(fadeColor[2], 0, 0, 0);
+								break;
+
+							case 1:
+								SET_COLOR(fadeColor[0], 0, 0, 0);
+								SET_COLOR(fadeColor[1], 0, 255, 0);
+								SET_COLOR(color[2], 0, 0, 0);
+								break;
+
+							case 2:
+								SET_COLOR(color[0], 0, 0, 0);
+								SET_COLOR(fadeColor[1], 0, 0, 0);
+								SET_COLOR(fadeColor[2], 0, 0, 255);
+
+							default:
+								animationState = -1;
+						}
+						break;
+
+					case 1:
+						animationState++;
+						switch (animationState) {
+							case 0:
+								SET_COLOR(fadeColor[0], rand(), rand(), rand());
+								SET_COLOR(color[1], 0, 0, 0);
+								SET_COLOR(fadeColor[2], 0, 0, 0);
+								break;
+
+							case 1:
+								SET_COLOR(fadeColor[0], 0, 0, 0);
+								SET_COLOR(fadeColor[1], rand(), rand(), rand());
+								SET_COLOR(color[2], 0, 0, 0);
+								break;
+
+							case 2:
+								SET_COLOR(color[0], 0, 0, 0);
+								SET_COLOR(fadeColor[1], 0, 0, 0);
+								SET_COLOR(fadeColor[2], rand(), rand(), rand());
+
+							default:
+								animationState = -1;
+						}
+						break;
+
+					case 2:
+						animationState++;
+						switch (animationState) {
+							case 0:
+								SET_COLOR(fadeColor[0], rand(), rand(), rand());
+								break;
+
+							case 1:
+								SET_COLOR(fadeColor[1], rand(), rand(), rand());
+								break;
+
+							case 2:
+								SET_COLOR(fadeColor[2], rand(), rand(), rand());
+								break;
+
+							case 3:
+								SET_COLOR(fadeColor[0], rand(), rand(), rand());
+								SET_COLOR(fadeColor[1], rand(), rand(), rand());
+								SET_COLOR(fadeColor[2], rand(), rand(), rand());
+
+							default:
+								animationState = -1;
+						}
+						break;
+
+					case 3:
+						animationState++;
+						switch (animationState) {
+							case 0:
+								SET_COLOR(fadeColor[0], rand(), rand(), rand());
+								SET_COLOR(fadeColor[2], 0, 0, 0);
+								break;
+
+							case 1:
+								fadeColor[1].data = fadeColor[0].data;
+								SET_COLOR(fadeColor[0], 0, 0, 0);
+								break;
+
+							case 2:
+								fadeColor[2].data = fadeColor[1].data;
+								SET_COLOR(fadeColor[1], 0, 0, 0);
+
+							default:
+								animationState = -1;
+						}
+						break;
+
+					case 4:
+						SET_COLOR(fadeColor[0], rand(), rand(), rand());
+						SET_COLOR(fadeColor[1], rand(), rand(), rand());
+						SET_COLOR(fadeColor[2], rand(), rand(), rand());
+						break;
 				}
 			}
 		}
@@ -249,7 +364,7 @@ int main(void)
 			if (menuStatus <= STATUS_SETTING) {
 				// save settings
 				settings.mode = menuMode;
-				settings.color[0] = color[0];
+				settings.color[0] = color[0];w
 				settings.color[1] = color[1];
 				settings.color[2] = color[2];
 			}
