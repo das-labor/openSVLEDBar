@@ -10,6 +10,8 @@ void lcdWriteCommand(uint8_t command);
 void lcdWriteData(uint8_t data);
 
 void lcdClear(void);
+void lcdSetPosition(uint8_t x, uint8_t y);
+void lcdSetCursor(uint8_t on);
 void lcdPutc(uint8_t x, uint8_t y, char c);
 void lcdPuts(uint8_t x, uint8_t y, const char* string);
 void lcdPuts_p(uint8_t x, uint8_t y, const char* string);

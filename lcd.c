@@ -86,6 +86,16 @@ void lcdClear(void)
 	lcdWriteCommand(0x01);
 }
 
+void lcdSetPosition(uint8_t x, uint8_t y) {
+	/* Simplified set address */
+	if(y) y = 0x40;
+	lcdWriteCommand(0x80 | y | x);
+}
+
+void lcdSetCursor(uint8_t on) {
+	lcdWriteCommand(on ? 0x0E : 0x0C);
+}
+
 void lcdPutc(uint8_t x, uint8_t y, char c)
 {
 	/* Simplified set address */

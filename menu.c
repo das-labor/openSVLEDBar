@@ -75,15 +75,16 @@ const char addressString[] PROGMEM = "Address";
 
 const char backString[] PROGMEM = "\x7f back";
 
-#define MENU_STRING_FIRST_MODE	3
-#define MENU_STRING_BACK		9
-#define MENU_STRING_FIRST_AUTO	10
-
 const uint8_t modeSettings[] = {3, 9, 1, 1, 0, 2};
 
-enum MODE menuMode;
+tMode menuMode;
+
 enum MENU_SETTING menuSetting;
 enum MENU_STATUS menuStatus, lastMenuStatus;
+
+extern tSettings settings;
+extern tColor color[3];
+
 /*
  * status = 0: Sleep
  * status = 1: Select Mode e.g. DMX 9ch
@@ -156,7 +157,7 @@ void menuNext(void)
 
 		case STATUS_MODE:
 			menuMode++;
-			if (menuMode == 6) {
+			if (menuMode == NUMBER_MODES) {
 				menuMode = 0;
 			}
 			break;
@@ -185,6 +186,7 @@ void menuNext(void)
 					} else if (menuSetting == SETTING_SPEED) {
 						if (settings.toggleBPM < 255) {
 							settings.toggleBPM++;
+							invalidateBPMTime();
 						}
 					}
 					break;
@@ -224,7 +226,7 @@ void menuPrev(void)
 
 		case STATUS_MODE:
 			if (menuMode == 0) {
-				menuMode = 6;
+				menuMode = NUMBER_MODES;
 			}
 			menuMode--;
 			break;
@@ -253,6 +255,7 @@ void menuPrev(void)
 					} else if (menuSetting == SETTING_SPEED) {
 						if (settings.toggleBPM > 1) {
 							settings.toggleBPM--;
+							invalidateBPMTime();
 						}
 					}
 					break;
@@ -280,12 +283,14 @@ void menuPrev(void)
 
 void menuDraw(void)
 {
+	lcdSetCursor(0);
 	lcdClear();
 	if (menuStatus == STATUS_SLEEP) {
 		// Draw Sleep
 		lcdPuts_p(0, 0, sleepStrings[0]);
 		lcdPuts_p(0, 1, sleepStrings[1]);
 	} else {
+		uint8_t value = 0;
 		for (uint8_t y = 0; y < 2; y++) {
 			switch (menuStatus+y) {
 				case STATUS_MODE: // Draw Mode Menu
@@ -294,6 +299,7 @@ void menuDraw(void)
 
 				case STATUS_MODE+1: // Draw Mode
 				lcdPuts_p(0, y, menuModeStrings[menuMode]);
+				value = 8 * menuMode / NUMBER_MODES;
 				break;
 
 				case STATUS_SETTING+1: // Draw Setting
@@ -338,6 +344,7 @@ void menuDraw(void)
 					} else if (menuSetting == SETTING_SPEED) {
 						lcdPutn(0, y, 4, settings.toggleBPM);
 						lcdPuts_p(5, y, BPMString);
+						value = settings.toggleBPM / 32;
 					}
  				} else if (menuMode == MODE_FIXED) {
  					lcdPutn(0, y, 8, color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
@@ -347,5 +354,7 @@ void menuDraw(void)
 				break;
 			}
 		}
+		lcdSetPosition(value, 1);
+		lcdSetCursor(1);
 	}
 }

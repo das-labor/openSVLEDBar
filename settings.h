@@ -3,14 +3,16 @@
 
 #include <stdint.h>
 
-enum MODE {
+typedef enum {
 	MODE_AUTO,
 	MODE_FIXED,
 	MODE_DMX3CH,
 	MODE_DMX9CH,
 	MODE_SLAVE,
 	MODE_SOUND
-};
+} tMode;
+
+#define NUMBER_MODES 6
 
 typedef struct {
 	union {
@@ -26,12 +28,12 @@ typedef struct {
 #define NUMBER_PROGRAMS 5
 
 typedef struct {
-	enum MODE mode;
+	tMode mode;
 	uint8_t fade; /* 0 = Off, 1-255 = 0.1-25.5 seconds */
-	uint8_t toggleBPM; /* 0 = Off, 1-255 = BPM */
-	tColor color[3];
+	uint8_t toggleBPM; /* 1-255 = BPM */
 	uint16_t dmxAddress;
 	uint8_t program;
+	tColor color[3];
 } tSettings;
 
 union tSettingsData {
@@ -39,6 +41,7 @@ union tSettingsData {
 	uint8_t data[sizeof(tSettings)];
 };
 
-extern tSettings settings;
+void setupSettings(void);
+void invalidateBPMTime(void);
 
 #endif

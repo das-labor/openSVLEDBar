@@ -37,6 +37,4 @@ void menuLongEnter(void);
 void menuNext(void);
 void menuPrev(void);
 
-extern enum MODE menuMode;
-
 #endif
