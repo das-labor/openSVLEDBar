@@ -28,8 +28,6 @@ typedef struct {
 	};
 } tColor;
 
-#define NUMBER_PROGRAMS 5
-
 typedef struct {
 	tMode mode;
 	uint8_t fade; /* 0 = Off, 1-255 = 0.1-25.5 seconds */

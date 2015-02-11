@@ -35,6 +35,7 @@
 #include "lcd.h"
 #include "settings.h"
 #include "main.h"
+#include "animations.h"
 
 const char sleepStrings[][9] PROGMEM = {
 	"OpenSVLB",
