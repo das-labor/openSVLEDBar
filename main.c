@@ -163,50 +163,14 @@ int main(void)
 				}
 
 				if (menuMode == MODE_AUTO) {
-					if (color[0].red < fadeColor[0].red) {
-						color[0].red++;
-					} else if (color[0].red > fadeColor[0].red) {
-						color[0].red--;
-					}
-					if (color[0].green < fadeColor[0].green) {
-						color[0].green++;
-					} else if (color[0].green > fadeColor[0].green) {
-						color[0].green--;
-					}
-					if (color[0].blue < fadeColor[0].blue) {
-						color[0].blue++;
-					} else if (color[0].blue > fadeColor[0].blue) {
-						color[0].blue--;
-					}
-					if (color[1].red < fadeColor[1].red) {
-						color[1].red++;
-					} else if (color[1].red > fadeColor[1].red) {
-						color[1].red--;
-					}
-					if (color[1].green < fadeColor[1].green) {
-						color[1].green++;
-					} else if (color[1].green > fadeColor[1].green) {
-						color[1].green--;
-					}
-					if (color[1].blue < fadeColor[1].blue) {
-						color[1].blue++;
-					} else if (color[1].blue > fadeColor[1].blue) {
-						color[1].blue--;
-					}
-					if (color[2].red < fadeColor[2].red) {
-						color[2].red++;
-					} else if (color[2].red > fadeColor[2].red) {
-						color[2].red--;
-					}
-					if (color[2].green < fadeColor[2].green) {
-						color[2].green++;
-					} else if (color[2].green > fadeColor[2].green) {
-						color[2].green--;
-					}
-					if (color[2].blue < fadeColor[2].blue) {
-						color[2].blue++;
-					} else if (color[2].blue > fadeColor[2].blue) {
-						color[2].blue--;
+					for (uint8_t i = 0; i < 3; i++) {
+						for (uint8_t j = 0; j < 3; j++) {
+							if (color[i].rgb[j] < fadeColor[i].rgb[j]) {
+								color[i].rgb[j]++;
+							} else if (color[i].rgb[j] > fadeColor[i].rgb[j]) {
+								color[i].rgb[j]--;
+							}
+						}
 					}
 				}
 
@@ -259,7 +223,7 @@ int main(void)
 			if (menuStatus <= STATUS_SETTING) {
 				// save settings
 				settings.mode = menuMode;
-				settings.color[0] = color[0];w
+				settings.color[0] = color[0];
 				settings.color[1] = color[1];
 				settings.color[2] = color[2];
 			}
