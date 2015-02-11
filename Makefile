@@ -5,7 +5,7 @@ PROG_PORT=usb
 
 TARGET=main.hex
 
-OBJ=menu.o lcd.o settings.o
+OBJ=menu.o lcd.o settings.o animations.o
 
 FORMAT=ihex
 OBJCOPY=avr-objcopy

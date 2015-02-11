@@ -13,6 +13,9 @@ void setupSettings()
 
 void invalidateBPMTime()
 {
-	bpmTime = (uint16_t)(0.5 + (60.0 * 1000.0 / 2.0) / (double)settings.toggleBPM);
-	bpmTimer = 0;
+	uint16_t newTime = (uint16_t)(0.5 + (60.0 * 1000.0 / 2.0) / (double)settings.toggleBPM);
+	if(bpmTime > newTime) {
+		bpmTimer = 0;
+	}
+	bpmTime = newTime;
 }
