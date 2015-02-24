@@ -17,6 +17,7 @@ uint8_t pwmClock, timerTicks = 0;
 tDMXstatus dmxStatus;
 uint16_t dmxCounter;
 uint8_t dmxResetCounter, dmxOffset;
+uint8_t soundTrigger;
 
 extern tMode menuMode;
 extern tSettings settings;
@@ -25,19 +26,6 @@ extern uint16_t bpmTime;
 tColor color[3], fadeColor[3];
 double fadeFrameDiff[][3]	= {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
 double fadeFrameCarry[][3]	= {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-
-void uartPutc(uint8_t c)
-{
-	while (!(UCSRA & (1<<UDRE)));
-	UDR = c;
-}
-
-void uartPuts(char *str)
-{
-	while (*str) {
-		uartPutc(*str++);
-	}
-}
 
 /* Timer 0: 125kHz Software PWM */
 ISR(TIMER0_OVF_vect)
@@ -139,6 +127,10 @@ ISR(USART_RX_vect)
 		dmxStatus = 0;
 		dmxResetCounter = 24;
 	}
+}
+
+ISR(INT1_vect) {
+	soundTrigger++;
 }
 
 int main(void)
@@ -278,13 +270,19 @@ int main(void)
 			UCSRB &= ~(1 << RXCIE);
 		}
 
+		if (menuMode == MODE_SOUND) {
+			GICR |= (1 << INT1);
+		} else {
+			GICR &= ~(1 << INT1);
+		}
+
 		switch (menuMode) {
 			case MODE_AUTO:
 			case MODE_SOUND:
 				if (menuMode == MODE_AUTO && bpmTimer == 0) {
 					bpmTimer = bpmTime;
-				} else if (menuMode == MODE_SOUND && 0) {
-					// TODO: Implement Sound To Light
+				} else if (menuMode == MODE_SOUND && soundTrigger > 0) {
+					soundTrigger = 0;
 				} else {
 					break;
 				}
