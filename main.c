@@ -14,6 +14,9 @@
 uint8_t buttonValue, buttonStatus, longEnter, longPrev, longNext;
 uint16_t sleepTimer = 0, minuteTimer = 0, bpmTimer = 0;
 uint8_t pwmClock, timerTicks = 0;
+tDMXstatus dmxStatus;
+uint16_t dmxCounter;
+uint8_t dmxResetCounter, dmxOffset;
 
 extern tMode menuMode;
 extern tSettings settings;
@@ -99,6 +102,45 @@ ISR(TIMER1_OVF_vect)
 	timerTicks++;
 }
 
+/* DMX Data Received */
+ISR(USART_RX_vect)
+{
+	if (UCSRB & (1 << RXB8)) {
+		if (!(dmxStatus & DMX_FINISHED)) {
+			if (!(dmxStatus & DMX_STARTED)) {
+				if (UDR == 0x00) {
+					dmxStatus |= DMX_STARTED;
+					dmxOffset = 0;
+					dmxCounter = settings.dmxAddress;
+				} else {
+					dmxStatus |= DMX_FINISHED;
+				}
+			} else {
+				if (dmxCounter == 0) {
+					if (menuMode == MODE_DMX9CH) {
+						color[dmxOffset / 3].rgb[dmxOffset % 3] = UDR;
+						dmxOffset++;
+						if (dmxOffset > 8) {
+							dmxStatus |= DMX_FINISHED;
+						}
+					} else if (menuMode == MODE_DMX3CH) {
+						color[0].rgb[dmxOffset] = color[1].rgb[dmxOffset] = color[2].rgb[dmxOffset] = UDR;
+						dmxOffset++;
+						if (dmxOffset > 2) {
+							dmxStatus |= DMX_FINISHED;
+						}
+					}
+				} else {
+					dmxCounter--;
+				}
+			}
+		}
+	} else {
+		dmxStatus = 0;
+		dmxResetCounter = 24;
+	}
+}
+
 int main(void)
 {
 	// Enable LED Ports
@@ -117,6 +159,14 @@ int main(void)
 	TCNT1H = 0xE8;
 	TCNT1L = 0x90;
 	TIMSK |= (1 << TOIE1) | (1 << TOIE0);
+
+	// Enable DMX UART
+	DDRD |= (1 << PD2);
+	PORTD &= ~(1 << PD2);
+	UBRRH = 0x00;
+	UBRRL = 0x05; // Set Baudrate to 125kHz
+	UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
+	UCSRB = (1 << RXEN) | (1 << UCSZ2);
 	sei();
 
 	// Enable pull-up resistors for buttons
@@ -222,6 +272,12 @@ int main(void)
 			}
 		}
 
+		if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+			UCSRB |= (1 << RXCIE);
+		} else {
+			UCSRB &= ~(1 << RXCIE);
+		}
+
 		switch (menuMode) {
 			case MODE_AUTO:
 			case MODE_SOUND:
@@ -291,6 +347,17 @@ int main(void)
 					fadeFrameDiff[2][2] = 0.0;
 				}
 
+				break;
+
+			case MODE_DMX9CH:
+			case MODE_DMX3CH:
+				dmxResetCounter--;
+				if(dmxResetCounter == 0) {
+					dmxStatus |= DMX_FINISHED;
+					SET_COLOR(color[0], 0, 0, 0);
+					SET_COLOR(color[1], 0, 0, 0);
+					SET_COLOR(color[2], 0, 0, 0);
+				}
 				break;
 
 			default:
