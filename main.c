@@ -297,60 +297,61 @@ int main(void)
 					break;
 				}
 
-				uint8_t fadeDiff;
+				int16_t fadeDiff;
+				double fadeSlots = (double)settings.fade * 50.0;
 				bpmTimer = bpmTime;
 				animate();
-				fadeDiff = fadeColor[0].red - color[0].red;
+				fadeDiff = (int16_t)fadeColor[0].red - (int16_t)color[0].red;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[0][0] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[0][0] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[0][0] = 0.0;
 				}
-				fadeDiff = fadeColor[0].green - color[0].green;
+				fadeDiff = (int16_t)fadeColor[0].green - (int16_t)color[0].green;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[0][1] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[0][1] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[0][1] = 0.0;
 				}
-				fadeDiff = fadeColor[0].blue - color[0].blue;
+				fadeDiff = (int16_t)fadeColor[0].blue - (int16_t)color[0].blue;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[0][2] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[0][2] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[0][2] = 0.0;
 				}
-				fadeDiff = fadeColor[1].red - color[1].red;
+				fadeDiff = (int16_t)fadeColor[1].red - (int16_t)color[1].red;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[1][0] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[1][0] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[1][0] = 0.0;
 				}
-				fadeDiff = fadeColor[1].green - color[1].green;
+				fadeDiff = (int16_t)fadeColor[1].green - (int16_t)color[1].green;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[1][1] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[1][1] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[1][1] = 0.0;
 				}
-				fadeDiff = fadeColor[1].blue - color[1].blue;
+				fadeDiff = (int16_t)fadeColor[1].blue - (int16_t)color[1].blue;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[1][2] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[1][2] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[1][2] = 0.0;
 				}
-				fadeDiff = fadeColor[2].red - color[2].red;
+				fadeDiff = (int16_t)fadeColor[2].red - (int16_t)color[2].red;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[2][0] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[2][0] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[2][0] = 0.0;
 				}
-				fadeDiff = fadeColor[2].green - color[2].green;
+				fadeDiff = (int16_t)fadeColor[2].green - (int16_t)color[2].green;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[2][1] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[2][1] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[2][1] = 0.0;
 				}
-				fadeDiff = fadeColor[2].blue - color[2].blue;
+				fadeDiff = (int16_t)fadeColor[2].blue - (int16_t)color[2].blue;
 				if (fadeDiff != 0) {
-					fadeFrameDiff[2][2] = ((float)settings.fade / 0.02) / (float)fadeDiff;
+					fadeFrameDiff[2][2] = (double)fadeDiff / fadeSlots;
 				} else {
 					fadeFrameDiff[2][2] = 0.0;
 				}
