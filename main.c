@@ -93,26 +93,26 @@ ISR(TIMER1_OVF_vect)
 /* DMX Data Received */
 ISR(USART_RX_vect)
 {
-	if (UCSRB & (1 << RXB8)) {
+	uint8_t rxStatus = UCSRB;
+	uint8_t rxData = UDR;
+	if (rxStatus & (1 << RXB8)) {
 		if (!(dmxStatus & DMX_FINISHED)) {
 			if (!(dmxStatus & DMX_STARTED)) {
-				if (UDR == 0x00) {
+				if (rxData == 0x00) {
 					dmxStatus |= DMX_STARTED;
 					dmxOffset = 0;
-					dmxCounter = settings.dmxAddress;
-				} else {
-					dmxStatus |= DMX_FINISHED;
+					dmxCounter = settings.dmxAddress - 1;
 				}
 			} else {
 				if (dmxCounter == 0) {
 					if (menuMode == MODE_DMX9CH) {
-						color[dmxOffset / 3].rgb[dmxOffset % 3] = UDR;
+						color[dmxOffset / 3].rgb[dmxOffset % 3] = rxData;
 						dmxOffset++;
 						if (dmxOffset > 8) {
 							dmxStatus |= DMX_FINISHED;
 						}
 					} else if (menuMode == MODE_DMX3CH) {
-						color[0].rgb[dmxOffset] = color[1].rgb[dmxOffset] = color[2].rgb[dmxOffset] = UDR;
+						color[0].rgb[dmxOffset] = color[1].rgb[dmxOffset] = color[2].rgb[dmxOffset] = rxData;
 						dmxOffset++;
 						if (dmxOffset > 2) {
 							dmxStatus |= DMX_FINISHED;
@@ -125,7 +125,7 @@ ISR(USART_RX_vect)
 		}
 	} else {
 		dmxStatus = 0;
-		dmxResetCounter = 24;
+		dmxResetCounter = 40;
 	}
 }
 
@@ -223,6 +223,16 @@ int main(void)
 								}
 							}
 						}
+					}
+				} else if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+					if(dmxResetCounter > 1) {
+						dmxResetCounter--;
+					} else if(dmxResetCounter == 1) {
+						dmxStatus |= DMX_FINISHED;
+						SET_COLOR(color[0], 0, 0, 0);
+						SET_COLOR(color[1], 0, 0, 0);
+						SET_COLOR(color[2], 0, 0, 0);
+						dmxResetCounter = 0;
 					}
 				}
 
@@ -345,17 +355,6 @@ int main(void)
 					fadeFrameDiff[2][2] = 0.0;
 				}
 
-				break;
-
-			case MODE_DMX9CH:
-			case MODE_DMX3CH:
-				dmxResetCounter--;
-				if(dmxResetCounter == 0) {
-					dmxStatus |= DMX_FINISHED;
-					SET_COLOR(color[0], 0, 0, 0);
-					SET_COLOR(color[1], 0, 0, 0);
-					SET_COLOR(color[2], 0, 0, 0);
-				}
 				break;
 
 			default:
