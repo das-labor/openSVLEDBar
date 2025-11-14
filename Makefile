@@ -17,7 +17,7 @@ CFLAGS+=-ffunction-sections -fdata-sections -mstrict-X -maccumulate-args -Wl,--g
 all: $(TARGET).hex $(TARGET).eep
 
 clean:
-	rm -f $(TARGET).hex $(TARGET).eep *.o
+	rm -f $(TARGET).hex $(TARGET).eep $(TARGET).elf $(TARGET).o $(OBJ)
 
 flash: $(TARGET).hex $(TARGET).eep
 	sudo avrdude -U flash:w:$(TARGET).hex:i -U eeprom:w:$(TARGET).eep:i -C /etc/avrdude.conf -v -p $(MMCU) -b 57600 -c $(PROG) -P $(PROG_PORT)
