@@ -31,6 +31,7 @@
 */
 
 #include <avr/pgmspace.h>
+#include <stdbool.h>
 #include "menu.h"
 #include "lcd.h"
 #include "settings.h"
@@ -78,13 +79,12 @@ const char backString[] PROGMEM = "\x7f back";
 
 const uint8_t modeSettings[] = {3, 9, 1, 1, 0, 2};
 
-tMode menuMode;
-
 enum MENU_SETTING menuSetting;
 enum MENU_STATUS menuStatus, lastMenuStatus;
 
 extern tSettings settings;
 extern tColor color[3];
+extern bool settingsChanged;
 
 /*
  * status = 0: Sleep
@@ -108,15 +108,16 @@ void menuEnter(void)
 		break;
 
 		case STATUS_MODE:
-		if (menuMode == MODE_SLAVE) {
+		if (settings.mode == MODE_SLAVE) {
 			menuSetting = SETTING_BACK; // Slave mode only has back
 		} else {
 			menuSetting = 1; // Skip back
 		}
 
 		// Validity check of the selected DMX-Channel
-		if (menuMode == MODE_DMX9CH && settings.dmxAddress > 504) {
+		if (settings.mode == MODE_DMX9CH && settings.dmxAddress > 504) {
 			settings.dmxAddress = 504;
+			settingsChanged = true;
 		}
 
 		menuStatus = STATUS_SETTING;
@@ -132,6 +133,8 @@ void menuEnter(void)
 
 		case STATUS_VALUE:
 		menuStatus = STATUS_SETTING;
+		// Extra save  
+		storeSettings();
 		break;
 	}
 	menuDraw();
@@ -157,21 +160,22 @@ void menuNext(void)
 			break;
 
 		case STATUS_MODE:
-			menuMode++;
-			if (menuMode == NUMBER_MODES) {
-				menuMode = 0;
+			settings.mode++;
+			if (settings.mode == NUMBER_MODES) {
+				settings.mode = 0;
 			}
+			settingsChanged = true;
 			break;
 
 		case STATUS_SETTING:
 			menuSetting++;
-			if (menuSetting > modeSettings[menuMode]) {
+			if (menuSetting > modeSettings[settings.mode]) {
 				menuSetting = 0;
 			}
 			break;
 
 		case STATUS_VALUE:
-			switch (menuMode) {
+			switch (settings.mode) {
 				case MODE_AUTO:
 				case MODE_SOUND:
 					if (menuSetting == SETTING_PROGRAM) {
@@ -180,14 +184,17 @@ void menuNext(void)
 						} else {
 							settings.program = 0;
 						}
+						settingsChanged = true;
 					} else if (menuSetting == SETTING_FADE) {
 						if (settings.fade < 255) {
 							settings.fade++;
+							settingsChanged = true;
 						}
 					} else if (menuSetting == SETTING_SPEED) {
 						if (settings.toggleBPM < 255) {
 							settings.toggleBPM++;
 							invalidateBPMTime();
+							settingsChanged = true;
 						}
 					}
 					break;
@@ -195,18 +202,21 @@ void menuNext(void)
 				case MODE_FIXED:
 					if (color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] < 255) {
 						color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]++;
+						settingsChanged = true;
 					}
 					break;
 
 				case MODE_DMX3CH:
 					if (settings.dmxAddress < 510) {
 						settings.dmxAddress++;
+						settingsChanged = true;
 					}
 					break;
 
 				case MODE_DMX9CH:
 					if (settings.dmxAddress < 504) {
 						settings.dmxAddress++;
+						settingsChanged = true;
 					}
 					break;
 
@@ -226,21 +236,22 @@ void menuPrev(void)
 			break;
 
 		case STATUS_MODE:
-			if (menuMode == 0) {
-				menuMode = NUMBER_MODES;
+			if (settings.mode == 0) {
+				settings.mode = NUMBER_MODES;
 			}
-			menuMode--;
+			settings.mode--;
+			settingsChanged = true;
 			break;
 
 		case STATUS_SETTING:
 			if (menuSetting == 0) {
-				menuSetting = modeSettings[menuMode] + 1;
+				menuSetting = modeSettings[settings.mode] + 1;
 			}
 			menuSetting--;
 			break;
 
 		case STATUS_VALUE:
-			switch (menuMode) {
+			switch (settings.mode) {
 				case MODE_AUTO:
 				case MODE_SOUND:
 					if (menuSetting == SETTING_PROGRAM) {
@@ -249,6 +260,7 @@ void menuPrev(void)
 						} else {
 							settings.program = NUMBER_PROGRAMS - 1;
 						}
+						settingsChanged = true;
 					} else if (menuSetting == SETTING_FADE) {
 						if (settings.fade > 0) {
 							settings.fade--;
@@ -257,6 +269,7 @@ void menuPrev(void)
 						if (settings.toggleBPM > 1) {
 							settings.toggleBPM--;
 							invalidateBPMTime();
+							settingsChanged = true;
 						}
 					}
 					break;
@@ -264,6 +277,7 @@ void menuPrev(void)
 				case MODE_FIXED:
 					if (color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3] > 0) {
 						color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]--;
+						settingsChanged = true;
 					}
 					break;
 
@@ -271,6 +285,7 @@ void menuPrev(void)
 				case MODE_DMX9CH:
 					if (settings.dmxAddress > 1) {
 						settings.dmxAddress--;
+						settingsChanged = true;
 					}
 					break;
 
@@ -299,8 +314,8 @@ void menuDraw(void)
 				break;
 
 				case STATUS_MODE+1: // Draw Mode
-				lcdPuts_p(0, y, menuModeStrings[menuMode]);
-				value = 8 * menuMode / NUMBER_MODES;
+				lcdPuts_p(0, y, menuModeStrings[settings.mode]);
+				value = 8 * settings.mode / NUMBER_MODES;
 				break;
 
 				case STATUS_SETTING+1: // Draw Setting
@@ -309,7 +324,7 @@ void menuDraw(void)
 					lcdPuts_p(1, y, backString);
 				} else {
 					// Other settings
-					switch (menuMode) {
+					switch (settings.mode) {
 						case MODE_AUTO:
 						case MODE_SOUND:
 						lcdPuts_p(0, y, autoModeStrings[menuSetting - 1]);
@@ -332,7 +347,9 @@ void menuDraw(void)
 				break;
 
 				case STATUS_VALUE+1: // Draw Value
-				if (menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
+				switch (settings.mode) {
+					case MODE_AUTO:
+					case MODE_SOUND:
 					if (menuSetting == SETTING_PROGRAM) {
 						lcdPutn(0, y, 8, settings.program + 1);
 					} else if (menuSetting == SETTING_FADE) {
@@ -347,11 +364,23 @@ void menuDraw(void)
 						lcdPuts_p(5, y, BPMString);
 						value = settings.toggleBPM / 32;
 					}
- 				} else if (menuMode == MODE_FIXED) {
+					break;
+
+					case MODE_FIXED:
  					lcdPutn(0, y, 8, color[(menuSetting - 1) / 3].rgb[(menuSetting - 1) % 3]);
- 				} else if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+					break;
+
+ 					case MODE_DMX3CH:
+					case MODE_DMX9CH:
  					lcdPutw(0, y, 8, settings.dmxAddress);
+					break;
+
+					default:
+					break;
  				}
+				break;
+
+				default:
 				break;
 			}
 		}

@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
 #include "settings.h"
 #include "main.h"
@@ -19,9 +20,9 @@ uint16_t dmxCounter;
 uint8_t dmxResetCounter, dmxOffset;
 uint8_t soundTrigger;
 
-extern tMode menuMode;
 extern tSettings settings;
 extern uint16_t bpmTime;
+extern bool settingsChanged;
 
 tColor color[3], fadeColor[3];
 double fadeFrameDiff[][3]	= {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
@@ -105,13 +106,13 @@ ISR(USART_RX_vect)
 				}
 			} else {
 				if (dmxCounter == 0) {
-					if (menuMode == MODE_DMX9CH) {
+					if (settings.mode == MODE_DMX9CH) {
 						color[dmxOffset / 3].rgb[dmxOffset % 3] = rxData;
 						dmxOffset++;
 						if (dmxOffset > 8) {
 							dmxStatus |= DMX_FINISHED;
 						}
-					} else if (menuMode == MODE_DMX3CH) {
+					} else if (settings.mode == MODE_DMX3CH) {
 						color[0].rgb[dmxOffset] = color[1].rgb[dmxOffset] = color[2].rgb[dmxOffset] = rxData;
 						dmxOffset++;
 						if (dmxOffset > 2) {
@@ -170,6 +171,11 @@ int main(void)
 			buttonValue |= ~(PIND | buttonStatus);
 			buttonStatus = (~PIND) | (buttonStatus & buttonValue);
 
+			// Store if settings changed
+			if (settingsChanged) {
+				storeSettings();
+			}
+
 			while (timerTicks > 0) {
 				timerTicks--;
 
@@ -206,7 +212,7 @@ int main(void)
 					minuteTimer = 0;
 				}
 
-				if (menuMode == MODE_AUTO || menuMode == MODE_SOUND) {
+				if (settings.mode == MODE_AUTO || settings.mode == MODE_SOUND) {
 					for (uint8_t i = 0; i < 3; i++) {
 						for (uint8_t j = 0; j < 3; j++) { 
 							if (color[i].rgb[j] != fadeColor[i].rgb[j]) {
@@ -224,7 +230,7 @@ int main(void)
 							}
 						}
 					}
-				} else if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+				} else if (settings.mode == MODE_DMX3CH || settings.mode == MODE_DMX9CH) {
 					if(dmxResetCounter > 1) {
 						dmxResetCounter--;
 					} else if(dmxResetCounter == 1) {
@@ -274,24 +280,24 @@ int main(void)
 			}
 		}
 
-		if (menuMode == MODE_DMX3CH || menuMode == MODE_DMX9CH) {
+		if (settings.mode == MODE_DMX3CH || settings.mode == MODE_DMX9CH) {
 			UCSRB |= (1 << RXCIE);
 		} else {
 			UCSRB &= ~(1 << RXCIE);
 		}
 
-		if (menuMode == MODE_SOUND) {
+		if (settings.mode == MODE_SOUND) {
 			GICR |= (1 << INT1);
 		} else {
 			GICR &= ~(1 << INT1);
 		}
 
-		switch (menuMode) {
+		switch (settings.mode) {
 			case MODE_AUTO:
 			case MODE_SOUND:
-				if (menuMode == MODE_AUTO && bpmTimer == 0) {
+				if (settings.mode == MODE_AUTO && bpmTimer == 0) {
 					bpmTimer = bpmTime;
-				} else if (menuMode == MODE_SOUND && soundTrigger > 0) {
+				} else if (settings.mode == MODE_SOUND && soundTrigger > 0) {
 					soundTrigger = 0;
 				} else {
 					break;
@@ -361,16 +367,6 @@ int main(void)
 			default:
 				break;
 		}
-
-		/* TODO
-			if (menuStatus <= STATUS_SETTING) {
-				// save settings
-				settings.mode = menuMode;
-				settings.color[0] = color[0];
-				settings.color[1] = color[1];
-				settings.color[2] = color[2];
-			}
-		*/
 	}
 	
 }

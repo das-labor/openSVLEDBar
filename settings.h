@@ -37,12 +37,8 @@ typedef struct {
 	tColor color[3];
 } tSettings;
 
-union tSettingsData {
-	tSettings settings;
-	uint8_t data[sizeof(tSettings)];
-};
-
 void setupSettings(void);
 void invalidateBPMTime(void);
+void storeSettings(void);
 
 #endif
